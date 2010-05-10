@@ -7,14 +7,11 @@
  * JPromoter for Joostina - свободное программное обеспечение распространяемое по условиям лицензии GNU/GPL
  * Для получения информации о используемых расширениях и замечаний об авторском праве, смотрите файл help/copyright.php.
  */
-/**
- * �������� ��� ����������� �� ������������� ����� Joomla - includes/sef.php
- */
 
 defined('_VALID_MOS') or die('������ �������� !');
-
+$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);
 $fst = preg_quote("&gclid=");
-$_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', urldecode( $_SERVER['REQUEST_URI']));
+$_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 $fst = preg_quote("?gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 
@@ -33,26 +30,17 @@ foreach ($temp['chars'] as $from => $to) {
     $replacedLetters[$from] = $to;
 }
 
-
-/**
- * ����������� ������ � ��������
- * 
- * �������� ��� ����������� ������� � ������ �� ��������������� �� ���������.
- * 
- * @param string ������ ��� ��������������
- * @return string ���������, ��������������� � �������� ������
- */
 function urlTranslit($string)
 {
     if ($GLOBALS['jpIsMbyte']) {
-        $string = mb_strtolower($string, $GLOBALS['jpEncoding']);
+        $string = utf8::strtolower($string, $GLOBALS['jpEncoding']);
         //$string = strtr($string, $GLOBALS['replacedLetters']);
        /* $string = preg_replace('/[^\pL\/]+/u', '-', $string);
         $string = preg_replace('/-\//u', '/', $string);
         $string = preg_replace('/\/-/u', '/', $string);*/
-        $string = str_replace(' ', '-', $string);
-        $string = str_replace('-/', '/', $string);
-        $string = str_replace('/-', '/', $string);
+        $string = utf8::str_ireplace(' ', '-', $string);
+        $string = utf8::str_ireplace('-/', '/', $string);
+        $string = utf8::str_ireplace('/-', '/', $string);
         $string = trim($string, '-');
     } else {
         // $string = strtolower($string);
@@ -95,7 +83,7 @@ if ($mosConfig_sef) {
     $originalAndSefUrls = $database->loadAssocList('original');
 
 
-    if (mb_substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
+    if (utf8::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 
         $inURL = $_SERVER['REQUEST_URI'];
 
@@ -106,15 +94,15 @@ if ($mosConfig_sef) {
             $sitePath = '';
         }
 
-        $inURL = mb_substr($inURL, mb_strlen($sitePath));
+        $inURL = utf8::substr($inURL, utf8::strlen($sitePath));
 
         $fragment = '';
 
-        $sharpPos = mb_strpos($inURL, '#');
+        $sharpPos = utf8::strpos($inURL, '#');
 
         if ($sharpPos !== false) {
-            $fragment = mb_substr($inURL, $sharpPos);
-            $inURL = mb_substr($inURL, 0, $sharpPos);
+            $fragment = utf8::substr($inURL, $sharpPos);
+            $inURL = utf8::substr($inURL, 0, $sharpPos);
         }
 
         foreach ($originalAndSefUrls as $orAndSef) {
@@ -196,7 +184,7 @@ if ($mosConfig_sef and (!$foundURL)) {
         // language hook for content
         $lang = '';
         foreach ($url_array as $key => $value) {
-            if (!strcasecmp(mb_substr($value, 0, 5), 'lang,')) {
+            if (!strcasecmp(utf8::substr($value, 0, 5), 'lang,')) {
                 $temp = explode(',', $value);
                 if (isset($temp[0]) && $temp[0] != '' && isset($temp[1]) && $temp[1] != '') {
                     $_GET['lang'] = $temp[1];
@@ -208,15 +196,15 @@ if ($mosConfig_sef and (!$foundURL)) {
         }
 
         if (isset($url_array[$pos + 8]) && $url_array[$pos + 8] != '' && in_array('category',
-            $url_array) && (mb_strpos($url_array[$pos + 5], 'order,') !== false) && (mb_strpos($url_array[$pos +
+            $url_array) && (utf8::strpos($url_array[$pos + 5], 'order,') !== false) && (utf8::strpos($url_array[$pos +
             6], 'filter,') !== false)) {
             // $option/$task/$sectionid/$id/$Itemid/$order/$filter/$limit/$limitstart
             $task = $url_array[$pos + 1];
             $sectionid = $url_array[$pos + 2];
             $id = $url_array[$pos + 3];
             $Itemid = $url_array[$pos + 4];
-            $order = str_replace('order,', '', $url_array[$pos + 5]);
-            $filter = str_replace('filter,', '', $url_array[$pos + 6]);
+            $order = utf8::str_ireplace('order,', '', $url_array[$pos + 5]);
+            $filter = utf8::str_ireplace('filter,', '', $url_array[$pos + 6]);
             $limit = $url_array[$pos + 7];
             $limitstart = $url_array[$pos + 8];
 
@@ -301,13 +289,13 @@ if ($mosConfig_sef and (!$foundURL)) {
                     $QUERY_STRING = "option=com_content&task=$task&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart&year=$year&month=$month";
                 } else
                     if (isset($url_array[$pos + 7]) && $url_array[$pos + 7] != '' && in_array('category',
-                        $url_array) && (mb_strpos($url_array[$pos + 5], 'order,') !== false)) {
+                        $url_array) && (utf8::strpos($url_array[$pos + 5], 'order,') !== false)) {
                         // $option/$task/$sectionid/$id/$Itemid/$order/$limit/$limitstart
                         $task = $url_array[$pos + 1];
                         $sectionid = $url_array[$pos + 2];
                         $id = $url_array[$pos + 3];
                         $Itemid = $url_array[$pos + 4];
-                        $order = str_replace('order,', '', $url_array[$pos + 5]);
+                        $order = utf8::str_ireplace('order,', '', $url_array[$pos + 5]);
                         $limit = $url_array[$pos + 6];
                         $limitstart = $url_array[$pos + 7];
 
@@ -483,8 +471,8 @@ if ($mosConfig_sef and (!$foundURL)) {
             if (is_dir($path)) {
                 $base = opendir($path);
                 while (false !== ($dir = readdir($base))) {
-                    if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $ir) && mb_strtolower($dir)
-                        !== 'cvs' && mb_strtolower($dir) !== '.svn') {
+                    if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $ir) && utf8::strtolower($dir)
+                        !== 'cvs' && utf8::strtolower($dir) !== '.svn') {
                         $dirlist[] = $dir;
                     }
                 }
@@ -540,10 +528,10 @@ if ($mosConfig_sef and (!$foundURL)) {
 
                 // SSL check - $http_host returns <live site url>:<port number if it is 443>
                 $http_host = explode(':', $_SERVER['HTTP_HOST']);
-                if ((!empty($_SERVER['HTTPS']) && mb_strtolower($_SERVER['HTTPS']) != 'off' ||
-                    isset($http_host[1]) && $http_host[1] == 443) && mb_substr($mosConfig_live_site, 0,
+                if ((!empty($_SERVER['HTTPS']) && utf8::strtolower($_SERVER['HTTPS']) != 'off' ||
+                    isset($http_host[1]) && $http_host[1] == 443) && utf8::substr($mosConfig_live_site, 0,
                     8) != 'https://') {
-                    $mosConfig_live_site = 'https://' . mb_substr($mosConfig_live_site, 7);
+                    $mosConfig_live_site = 'https://' . utf8::substr($mosConfig_live_site, 7);
                 }
             }
 
@@ -553,8 +541,8 @@ if ($mosConfig_sef and (!$foundURL)) {
             Unknown content
             http://www.domain.com/unknown
             */
-            $jdir = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-            $juri = str_replace($jdir, '', $_SERVER['REQUEST_URI']);
+            $jdir = utf8::str_ireplace('index.php', '', $_SERVER['PHP_SELF']);
+            $juri = utf8::str_ireplace($jdir, '', $_SERVER['REQUEST_URI']);
 
             if ($juri != '' && $juri != '/' && !mb_eregi("index\.php", $_SERVER['REQUEST_URI']) &&
                 !mb_eregi("index2\.php", $_SERVER['REQUEST_URI']) && !mb_eregi("/\?", $_SERVER['REQUEST_URI']) &&
@@ -578,13 +566,13 @@ function sefRelToAbs($string)
     global $mosConfig_live_site, $mosConfig_sef, $mosConfig_multilingual_support;
     global $iso_client_lang, $_MAMBOTS;
 
-    if (mb_strpos($string, '.value') !== false)
+    if (utf8::strpos($string, '.value') !== false)
         return $string;
 
     $_MAMBOTS->trigger('jpOnURLGenerate', $string);
 
-    if (mb_substr($string, 0, mb_strlen($mosConfig_live_site)) == $mosConfig_live_site) {
-        $string = mb_substr($string, mb_strlen($mosConfig_live_site));
+    if (utf8::substr($string, 0, utf8::strlen($mosConfig_live_site)) == $mosConfig_live_site) {
+        $string = utf8::substr($string, utf8::strlen($mosConfig_live_site));
     }
 
     $string = ltrim($string, '/');
@@ -592,13 +580,13 @@ function sefRelToAbs($string)
 
     //multilingual code url support
     if ($mosConfig_sef && $mosConfig_multilingual_support && $string != 'index.php' &&
-        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(mb_substr($string, 0, 9),
+        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(utf8::substr($string, 0, 9),
         'index.php') && !mb_eregi('lang=', $string)) {
         $string .= '&amp;lang=' . $iso_client_lang;
     }
 
     // SEF URL Handling
-    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(mb_substr($string,
+    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(utf8::substr($string,
         0, 9), 'index.php')) {
         // Replace all &amp; with &
         $string = str_replace('&amp;', '&', $string);
@@ -630,10 +618,10 @@ function sefRelToAbs($string)
             $originalURL = '/' . $string;
 
 
-            $sharpPos = mb_strpos($originalURL, '#');
+            $sharpPos = utf8::strpos($originalURL, '#');
 
             if ($sharpPos !== false) {
-                $originalURL = mb_substr($originalURL, 0, $sharpPos);
+                $originalURL = utf8::substr($originalURL, 0, $sharpPos);
             }
 
 
@@ -677,7 +665,7 @@ function sefRelToAbs($string)
         // check if link contained a query component
         if (isset($url['query'])) {
             // special handling for javascript
-            $url['query'] = stripslashes(str_replace('+', '%2b', $url['query']));
+            $url['query'] = stripslashes(utf8::str_ireplace('+', '%2b', $url['query']));
             // clean possible xss attacks
             $url['query'] = preg_replace("'%3Cscript[^%3E]*%3E.*?%3C/script%3E'si", '', $url['query']);
 
@@ -686,8 +674,8 @@ function sefRelToAbs($string)
 
             // special handling for javascript
             foreach ($parts as $key => $value) {
-                if (mb_strpos($value, '+') !== false) {
-                    $parts[$key] = stripslashes(str_replace('%2b', '+', $value));
+                if (utf8::strpos($value, '+') !== false) {
+                    $parts[$key] = stripslashes(utf8::str_ireplace('%2b', '+', $value));
                 }
             }
             //var_dump($parts);
@@ -756,7 +744,7 @@ function sefRelToAbs($string)
                 // all other components
                 // index.php?option=com_xxxx &...
             } else
-                if (isset($parts['option']) && (mb_strpos($parts['option'], 'com_') !== false)) {
+                if (isset($parts['option']) && (utf8::strpos($parts['option'], 'com_') !== false)) {
                     // do not SEF where com_content - `edit` or `new` task link
                     if (!(($parts['option'] == 'com_content') && ((isset($parts['task']) == 'new') ||
                         (isset($parts['task']) == 'edit')))) {
@@ -768,7 +756,7 @@ function sefRelToAbs($string)
                             $sefstring .= $key . ',' . $value . '/';
                         }
 
-                        $string = str_replace('=', ',', $sefstring);
+                        $string = utf8::str_ireplace('=', ',', $sefstring);
                     }
                 }
             // no query given. Empty $string to get only the fragment
@@ -927,7 +915,7 @@ function sefRelToAbs($string)
                         switch ($var['type']) {
                             case 'query':
 
-                                $var['query'] = str_replace($searchArray, array_values($urlArgumentList), $var['query']);
+                                $var['query'] = utf8::str_ireplace($searchArray, array_values($urlArgumentList), $var['query']);
 
                                 static $_pach;
 
@@ -939,8 +927,8 @@ function sefRelToAbs($string)
                                 $val = $_pach[$var['query']];
 
                                 if (empty($val)) {
-                                    $rnd = mb_substr(md5(mt_rand(1, 1000)), 0, 16);
-                                    $val = str_replace('?', $rnd, $var['empty']);
+                                    $rnd = utf8::substr(md5(mt_rand(1, 1000)), 0, 16);
+                                    $val = utf8::str_ireplace('?', $rnd, $var['empty']);
                                 }
 
                                 $sefConfigs[$comp]['values']['values'][] = urlTranslit($val);
@@ -948,7 +936,7 @@ function sefRelToAbs($string)
                                 break;
                             case 'string':
 
-                                $sefConfigs[$comp]['values']['values'][] = urlTranslit(str_replace($searchArray,
+                                $sefConfigs[$comp]['values']['values'][] = urlTranslit(utf8::str_ireplace($searchArray,
                                     array_values($urlArgumentList), $var['value']));
 
                                 break;
@@ -972,7 +960,7 @@ function sefRelToAbs($string)
 
                         if (array_intersect_assoc($cond['arguments'], $urlArgumentList) == $cond['arguments']) {
 
-                            $resultUrl = str_replace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
+                            $resultUrl = utf8::str_ireplace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
                                 $cond['tpl']);
 
                             break;
@@ -1025,7 +1013,7 @@ function sefRelToAbs($string)
     } else {
         // Handling for when SEF is not activated
         // Relative link handling
-        if ((mb_strpos($string, $mosConfig_live_site) !== 0)) {
+        if ((utf8::strpos($string, $mosConfig_live_site) !== 0)) {
             // if URI starts with a "/", means URL is at the root of the host...
             if (strncmp($string, '/', 1) == 0) {
                 // splits http(s)://xx.xx/yy/zz..." into [1]="http(s)://xx.xx" and [2]="/yy/zz...":
@@ -1042,7 +1030,7 @@ function sefRelToAbs($string)
                 $url_schemes[] = 'https:';
 
                 foreach ($url_schemes as $url) {
-                    if (mb_strpos($string, $url) === 0) {
+                    if (utf8::strpos($string, $url) === 0) {
                         $check = 0;
                     }
                 }
