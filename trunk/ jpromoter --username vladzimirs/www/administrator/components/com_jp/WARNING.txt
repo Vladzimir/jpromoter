@@ -1,8 +1,0 @@
-
-Attention ! Due to technical peculiarities of Joomla inner structure, JPromoter
-component is incompatible with third party SEF components. That is why for correct
-work of JPromoter it is indispensible to uninstall preceding third party SEF component.
-
-The same, not damage files of JPromoter, it is not allowed to install third party
-SEF components over JPromoter. Before installation of such components delete JPromoter first. 
-
