@@ -14,7 +14,7 @@
 defined('_VALID_MOS') or die('������ �������� !');
 
 $fst = preg_quote("&gclid=");
-$_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
+$_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', urldecode( $_SERVER['REQUEST_URI']));
 $fst = preg_quote("?gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 
@@ -24,9 +24,8 @@ $translitINIFile = $GLOBALS['mosConfig_absolute_path'] .
     '/administrator/components/com_jp/sef_translits/' . $currCodepage . '.ini';
 
 $temp = parse_ini_file($translitINIFile, true);
-$jpIsMbyte = isset($temp['options']['is_mb']) ? (bool)$temp['options']['is_mb'] : false;
-$jpEncoding = isset($temp['options']['encoding']) ? $temp['options']['encoding'] :
-    'UTF-8';
+$jpIsMbyte = true;
+$jpEncoding = 'UTF-8';
 
 $replacedLetters = array();
 
@@ -46,11 +45,14 @@ foreach ($temp['chars'] as $from => $to) {
 function urlTranslit($string)
 {
     if ($GLOBALS['jpIsMbyte']) {
-        //$string = mb_strtolower($string, $GLOBALS['jpEncoding']);
-        $string = strtr($string, $GLOBALS['replacedLetters']);
-        $string = preg_replace('/[^\w\/]+/u', '-', $string);
+        $string = mb_strtolower($string, $GLOBALS['jpEncoding']);
+        //$string = strtr($string, $GLOBALS['replacedLetters']);
+       /* $string = preg_replace('/[^\pL\/]+/u', '-', $string);
         $string = preg_replace('/-\//u', '/', $string);
-        $string = preg_replace('/\/-/u', '/', $string);
+        $string = preg_replace('/\/-/u', '/', $string);*/
+        $string = str_replace(' ', '-', $string);
+        $string = str_replace('-/', '/', $string);
+        $string = str_replace('/-', '/', $string);
         $string = trim($string, '-');
     } else {
         // $string = strtolower($string);
@@ -93,7 +95,7 @@ if ($mosConfig_sef) {
     $originalAndSefUrls = $database->loadAssocList('original');
 
 
-    if (substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
+    if (mb_substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 
         $inURL = $_SERVER['REQUEST_URI'];
 
@@ -104,15 +106,15 @@ if ($mosConfig_sef) {
             $sitePath = '';
         }
 
-        $inURL = substr($inURL, strlen($sitePath));
+        $inURL = mb_substr($inURL, mb_strlen($sitePath));
 
         $fragment = '';
 
-        $sharpPos = strpos($inURL, '#');
+        $sharpPos = mb_strpos($inURL, '#');
 
         if ($sharpPos !== false) {
-            $fragment = substr($inURL, $sharpPos);
-            $inURL = substr($inURL, 0, $sharpPos);
+            $fragment = mb_substr($inURL, $sharpPos);
+            $inURL = mb_substr($inURL, 0, $sharpPos);
         }
 
         foreach ($originalAndSefUrls as $orAndSef) {
@@ -135,7 +137,7 @@ if ($mosConfig_sef) {
 
                     $_SERVER['QUERY_STRING'] = $pUrl['query'];
 
-                    parse_str($pUrl['query'], $pQuery);
+                    mb_parse_str($pUrl['query'], $pQuery);
 
                     $_REQUEST = $_REQUEST + $pQuery;
                     $_GET = $_GET + $pQuery;
@@ -152,7 +154,7 @@ if ($mosConfig_sef) {
 
         $pInURL = parse_url($inURL);
         if (isset($pInURL['query'])) {
-        parse_str($pInURL['query'], $args);
+        mb_parse_str($pInURL['query'], $args);
         };
 
         if (empty($args['option'])) {
@@ -194,7 +196,7 @@ if ($mosConfig_sef and (!$foundURL)) {
         // language hook for content
         $lang = '';
         foreach ($url_array as $key => $value) {
-            if (!strcasecmp(substr($value, 0, 5), 'lang,')) {
+            if (!strcasecmp(mb_substr($value, 0, 5), 'lang,')) {
                 $temp = explode(',', $value);
                 if (isset($temp[0]) && $temp[0] != '' && isset($temp[1]) && $temp[1] != '') {
                     $_GET['lang'] = $temp[1];
@@ -206,7 +208,7 @@ if ($mosConfig_sef and (!$foundURL)) {
         }
 
         if (isset($url_array[$pos + 8]) && $url_array[$pos + 8] != '' && in_array('category',
-            $url_array) && (strpos($url_array[$pos + 5], 'order,') !== false) && (strpos($url_array[$pos +
+            $url_array) && (mb_strpos($url_array[$pos + 5], 'order,') !== false) && (mb_strpos($url_array[$pos +
             6], 'filter,') !== false)) {
             // $option/$task/$sectionid/$id/$Itemid/$order/$filter/$limit/$limitstart
             $task = $url_array[$pos + 1];
@@ -299,7 +301,7 @@ if ($mosConfig_sef and (!$foundURL)) {
                     $QUERY_STRING = "option=com_content&task=$task&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart&year=$year&month=$month";
                 } else
                     if (isset($url_array[$pos + 7]) && $url_array[$pos + 7] != '' && in_array('category',
-                        $url_array) && (strpos($url_array[$pos + 5], 'order,') !== false)) {
+                        $url_array) && (mb_strpos($url_array[$pos + 5], 'order,') !== false)) {
                         // $option/$task/$sectionid/$id/$Itemid/$order/$limit/$limitstart
                         $task = $url_array[$pos + 1];
                         $sectionid = $url_array[$pos + 2];
@@ -481,8 +483,8 @@ if ($mosConfig_sef and (!$foundURL)) {
             if (is_dir($path)) {
                 $base = opendir($path);
                 while (false !== ($dir = readdir($base))) {
-                    if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $dir) && strtolower($dir)
-                        !== 'cvs' && strtolower($dir) !== '.svn') {
+                    if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $ir) && mb_strtolower($dir)
+                        !== 'cvs' && mb_strtolower($dir) !== '.svn') {
                         $dirlist[] = $dir;
                     }
                 }
@@ -538,10 +540,10 @@ if ($mosConfig_sef and (!$foundURL)) {
 
                 // SSL check - $http_host returns <live site url>:<port number if it is 443>
                 $http_host = explode(':', $_SERVER['HTTP_HOST']);
-                if ((!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off' ||
-                    isset($http_host[1]) && $http_host[1] == 443) && substr($mosConfig_live_site, 0,
+                if ((!empty($_SERVER['HTTPS']) && mb_strtolower($_SERVER['HTTPS']) != 'off' ||
+                    isset($http_host[1]) && $http_host[1] == 443) && mb_substr($mosConfig_live_site, 0,
                     8) != 'https://') {
-                    $mosConfig_live_site = 'https://' . substr($mosConfig_live_site, 7);
+                    $mosConfig_live_site = 'https://' . mb_substr($mosConfig_live_site, 7);
                 }
             }
 
@@ -554,11 +556,12 @@ if ($mosConfig_sef and (!$foundURL)) {
             $jdir = str_replace('index.php', '', $_SERVER['PHP_SELF']);
             $juri = str_replace($jdir, '', $_SERVER['REQUEST_URI']);
 
-            if ($juri != '' && $juri != '/' && !eregi("index\.php", $_SERVER['REQUEST_URI']) &&
-                !eregi("index2\.php", $_SERVER['REQUEST_URI']) && !eregi("/\?", $_SERVER['REQUEST_URI']) &&
+            if ($juri != '' && $juri != '/' && !mb_eregi("index\.php", $_SERVER['REQUEST_URI']) &&
+                !mb_eregi("index2\.php", $_SERVER['REQUEST_URI']) && !mb_eregi("/\?", $_SERVER['REQUEST_URI']) &&
                 $_SERVER['QUERY_STRING'] == '') {
                 header('HTTP/1.0 404 Not Found');
-                require_once ($mosConfig_absolute_path . '/templates/404.php');
+                //echo $_SERVER['REQUEST_URI'];
+                require_once ($mosConfig_absolute_path . '/templates/system/404.php');
                 exit(404);
             }
         }
@@ -575,13 +578,13 @@ function sefRelToAbs($string)
     global $mosConfig_live_site, $mosConfig_sef, $mosConfig_multilingual_support;
     global $iso_client_lang, $_MAMBOTS;
 
-    if (strpos($string, '.value') !== false)
+    if (mb_strpos($string, '.value') !== false)
         return $string;
 
     $_MAMBOTS->trigger('jpOnURLGenerate', $string);
 
-    if (substr($string, 0, strlen($mosConfig_live_site)) == $mosConfig_live_site) {
-        $string = substr($string, strlen($mosConfig_live_site));
+    if (mb_substr($string, 0, mb_strlen($mosConfig_live_site)) == $mosConfig_live_site) {
+        $string = mb_substr($string, mb_strlen($mosConfig_live_site));
     }
 
     $string = ltrim($string, '/');
@@ -589,13 +592,13 @@ function sefRelToAbs($string)
 
     //multilingual code url support
     if ($mosConfig_sef && $mosConfig_multilingual_support && $string != 'index.php' &&
-        !eregi("^(([^:/?#]+):)", $string) && !strcasecmp(substr($string, 0, 9),
-        'index.php') && !eregi('lang=', $string)) {
+        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(mb_substr($string, 0, 9),
+        'index.php') && !mb_eregi('lang=', $string)) {
         $string .= '&amp;lang=' . $iso_client_lang;
     }
 
     // SEF URL Handling
-    if ($mosConfig_sef && !eregi("^(([^:/?#]+):)", $string) && !strcasecmp(substr($string,
+    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(mb_substr($string,
         0, 9), 'index.php')) {
         // Replace all &amp; with &
         $string = str_replace('&amp;', '&', $string);
@@ -627,10 +630,10 @@ function sefRelToAbs($string)
             $originalURL = '/' . $string;
 
 
-            $sharpPos = strpos($originalURL, '#');
+            $sharpPos = mb_strpos($originalURL, '#');
 
             if ($sharpPos !== false) {
-                $originalURL = substr($originalURL, 0, $sharpPos);
+                $originalURL = mb_substr($originalURL, 0, $sharpPos);
             }
 
 
@@ -679,11 +682,11 @@ function sefRelToAbs($string)
             $url['query'] = preg_replace("'%3Cscript[^%3E]*%3E.*?%3C/script%3E'si", '', $url['query']);
 
             // break url into component parts
-            parse_str($url['query'], $parts);
+            mb_parse_str($url['query'], $parts);
 
             // special handling for javascript
             foreach ($parts as $key => $value) {
-                if (strpos($value, '+') !== false) {
+                if (mb_strpos($value, '+') !== false) {
                     $parts[$key] = stripslashes(str_replace('%2b', '+', $value));
                 }
             }
@@ -753,14 +756,14 @@ function sefRelToAbs($string)
                 // all other components
                 // index.php?option=com_xxxx &...
             } else
-                if (isset($parts['option']) && (strpos($parts['option'], 'com_') !== false)) {
+                if (isset($parts['option']) && (mb_strpos($parts['option'], 'com_') !== false)) {
                     // do not SEF where com_content - `edit` or `new` task link
                     if (!(($parts['option'] == 'com_content') && ((isset($parts['task']) == 'new') ||
                         (isset($parts['task']) == 'edit')))) {
                         $sefstring = 'component/';
 
                         foreach ($parts as $key => $value) {
-                            // remove slashes automatically added by parse_str
+                            // remove slashes automatically added by mb_parse_str
                             $value = stripslashes($value);
                             $sefstring .= $key . ',' . $value . '/';
                         }
@@ -797,7 +800,7 @@ function sefRelToAbs($string)
             global $sefConfigs;
 
             // ������ imit=' + this.options[selectedIndex].value + '
-            parse_str($urlComponents['query'], $urlQuery);
+            mb_parse_str($urlComponents['query'], $urlQuery);
 
             // ��������, ����� �������������� ���� ������ �� �����, ��� ���������� ��� �������� � �������
             //        $tempArray = explode('&', $urlComponents['query']);
@@ -936,7 +939,7 @@ function sefRelToAbs($string)
                                 $val = $_pach[$var['query']];
 
                                 if (empty($val)) {
-                                    $rnd = substr(md5(mt_rand(1, 1000)), 0, 16);
+                                    $rnd = mb_substr(md5(mt_rand(1, 1000)), 0, 16);
                                     $val = str_replace('?', $rnd, $var['empty']);
                                 }
 
@@ -1022,12 +1025,12 @@ function sefRelToAbs($string)
     } else {
         // Handling for when SEF is not activated
         // Relative link handling
-        if ((strpos($string, $mosConfig_live_site) !== 0)) {
+        if ((mb_strpos($string, $mosConfig_live_site) !== 0)) {
             // if URI starts with a "/", means URL is at the root of the host...
             if (strncmp($string, '/', 1) == 0) {
                 // splits http(s)://xx.xx/yy/zz..." into [1]="http(s)://xx.xx" and [2]="/yy/zz...":
                 $live_site_parts = array();
-                eregi("^(https?:[\/]+[^\/]+)(.*$)", $mosConfig_live_site, $live_site_parts);
+                mb_eregi("^(https?:[\/]+[^\/]+)(.*$)", $mosConfig_live_site, $live_site_parts);
 
                 $string = $live_site_parts[1] . $string;
             } else {
@@ -1039,7 +1042,7 @@ function sefRelToAbs($string)
                 $url_schemes[] = 'https:';
 
                 foreach ($url_schemes as $url) {
-                    if (strpos($string, $url) === 0) {
+                    if (mb_strpos($string, $url) === 0) {
                         $check = 0;
                     }
                 }
