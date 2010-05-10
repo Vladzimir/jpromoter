@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mosinstall type="component" version="1.0.0">
+	<name>JP</name>
+	<author>Vladzimir</author>
+	<creationDate>May 2010</creationDate>
+	<copyright>(c) 2010 JPromoter.</copyright>
+	<license>GPL</license>
+	<authorEmail>vladzimirs@gmail.com</authorEmail>
+	<authorUrl>http://jpromoter.googlecode.com</authorUrl>
+	<version>1 alfa</version>
+	<description>Компонент ЧеловекоПонятныхСсылок (ЧПУ) и СЕО-оптимизации.</description>
+  <install>
+    <queries>
+    <!-- JE CONFIGS -->
+      <query id="1"><![CDATA[ 
+        CREATE TABLE IF NOT EXISTS `#__je_config` (
+          `id` int(10) unsigned NOT NULL auto_increment,
+          `component` varchar(30) NOT NULL default '',
+          `section` varchar(45) NOT NULL default '',
+          `lable` varchar(255) NOT NULL default '',
+          `name` varchar(45) NOT NULL default '',
+          `type` set('selectlist','yesno','dropdown','text','textarea') NOT NULL default 'text',
+          `description` tinytext,
+          `values` tinytext NOT NULL,
+          `selected` tinytext NOT NULL,
+          `hidden` enum('Y','N') NOT NULL default 'N',
+          `fieldset` varchar(45) NOT NULL default '',
+          PRIMARY KEY  (`id`),
+          UNIQUE KEY `name` (`name`)
+        );
+      ]]></query>
+      <query id="2"><![CDATA[DELETE FROM #__je_config WHERE component = 'com_jp';]]></query>
+      <query id="3"><![CDATA[ 
+           INSERT INTO `#__je_config` (`id`,`component`,`section`,`lable`,`name`,`type`,`description`,`values`,`selected`,`hidden`,`fieldset`) VALUES 
+           (NULL,'com_jp','general','Enable JPromoter','jp_enable','yesno','Turn JPromoter On or Off','','1','N','Control'),
+           (NULL,'com_jp','general','Enable Google Page Rank','jp_google_pr','yesno','ATTENTION: It can slow down simulate process.','','0','N','Google tools'),
+           (NULL,'com_jp','general','Rows in Report','jp_toppage','text','Amount of rows in table on report section','30','50','N','Control'),
+           (NULL,'com_jp','general','Suggest Keywords','jp_kw_per_page','text','How many keywords to suggest(list) on edit page section','36','36','N','Control'),
+           (NULL,'com_jp','general','Enable Alexa Page Rank','jp_alexa_pr','yesno','ATTENTION: It can slow down simulate process.','','0','N','PR - Alexa'),
+           (NULL,'com_jp','general','Alexa key','jp_alexa_key','text','Enter your alexe key','','','N','PR - Alexa'),
+           (NULL,'com_jp','general','Alexa secret key','jp_alexa_secret_key','text','Enter Youe Alexa Secret Key','','','N','PR - Alexa'),
+           (NULL,'com_jp','general','Default \"changefreq\" for Google sitemap','jp_gsm_changefreq','dropdown','','always, hourly, daily, weekly, monthly, yearly, never','monthly','N','Google tools'),
+           (NULL,'com_jp','general','Google Sitemap based on','jp_gsm_pages','selectlist','','Indexed Pages, Published Pages, Not Hidden Pages','Not Hidden Pages','N','Google tools'),
+           (NULL,'com_jp','general','Google aprove Meta','jp_meta_verify','text','Working with Google Webmaster Tools (https://www.google.com/webmasters/sitemaps/siteoverview) require site verification. This can be done by uploading file with special name or inserting special Meta tag. So this is that one.','','','N','Google tools'),
+           (NULL,'com_jp','general','Google Sitemap file name *.xml','jp_sitemap_filename','text','Traditionally the name is sitemap.xml. After generating Google Sitemap this file will appear in domain root directory. This requirement by Google. ','','sitemap.xml','N','Google tools'),
+           (NULL,'com_jp','general','Google key','jp_google_key','text','Your google key. You can get this key here (https://www.google.com/accounts/NewAccount). If you already have an account please, enter your existing information and Google will mail you the key.','','','N','Google tools'),
+           (NULL,'com_jp','Meta','Default Meta Copyright','jp_meta_copyright','text','Skipped if empty','','www.joomlaequipment.com','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Default Meta Author','jp_meta_author','text','Skipped if empty ','','Aleksey Terehin, Sergey Romanov, Danil Chernyshev','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Default PageTitle','jp_page_title','text','','','Joomla - JoomlaEquipment - JPromoter','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','If meta empty show default','jp_show_default','yesno','','','1','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Default Meta Title','jp_meta_title','text','','','Joomla, JPromoter','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Deafault Meta Description','jp_meta_descr','textarea','','','JPromoter - Joomla SEO greate tool','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Default Meta Keywords','jp_meta_kwd','textarea','','','Joomla, JPromoter','N','Default Meta Information'),
+           (NULL,'com_jp','Meta','Reverse Title','jp_reverse_title','selectlist','By defalt Joomla preppend site name before any title. It looks like this (Site Name - Content Title). After reversing will looks like this (Content Title - Site Name).','None, All except published','All except published','N','Default Meta Information'),
+           (NULL,'com_jp','SEF', 'Enable SEF', 'sef_enable', 'yesno', 'Enable - disable JPromoter SEF URLs', '', '1', 'N', 'SEF Configuration'),
+           (NULL,'com_jp','SEF', 'URL for update SEF integrations', 'jp_sef_xml_url', 'text', 'URL for update SEF component integrations', '', 'http://joomlaequipment.com/index.php?option=com_docman&task=doc_download&gid=17', 'N', 'SEF Configuration'),
+           (NULL,'com_jp','SEF', 'Codepage', 'jp_codepage', 'dropdown', 'Current codepage', '', 'iso-8859-1', 'N', 'Translit configuration');
+       ]]></query>
+      <!-- JP IMAGES -->
+      <query id="4"><![CDATA[DROP TABLE IF EXISTS #__jp_images;]]></query>
+      <query id="5"><![CDATA[
+CREATE TABLE #__jp_images (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `src` varchar(255) NOT NULL default '',
+  `alt` varchar(255) NOT NULL default '',
+  `width` mediumint(6) unsigned NOT NULL default 0,
+  `height` mediumint(6) unsigned NOT NULL default 0,
+  `size` int(20) unsigned NOT NULL default 0,
+  `type` varchar(15) NOT NULL default '',
+  `preview` blob,
+  `broken` tinyint(1) unsigned NOT NULL default 0,
+  `simtime` datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`src`,`simtime`)
+);
+      ]]></query>
+      <!-- JP LINKS -->
+      <query id="6"><![CDATA[ DROP TABLE IF EXISTS #__jp_links;]]></query>
+      <query id="7"><![CDATA[ 
+CREATE TABLE #__jp_links (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `href` varchar(255) NOT NULL default '',
+  `title` varchar(255) NOT NULL default '',
+  `type` set('external','internal') NOT NULL default 'internal',
+  `status` set('indexed','new') NOT NULL default 'new',
+  `simtime` datetime NOT NULL default '0000-00-00 00:00:00',
+  `contenttype` varchar(45) NOT NULL default '',
+  `errcode` char(3) NOT NULL default '',
+  `moved` varchar(255) NOT NULL default '',
+  `tagtitle` varchar(255) NOT NULL default '',
+  `pagesize` int(10) unsigned NOT NULL default 0,
+  `imagessize` int(10) unsigned NOT NULL default 0,
+  PRIMARY KEY  (`id`)
+);
+      ]]></query>
+      <!-- JP PAGES -->
+      <query id="8"><![CDATA[ DROP TABLE IF EXISTS #__jp_pages;]]></query>
+      <query id="9"><![CDATA[ 
+CREATE TABLE #__jp_pages (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `original` varchar(255) NOT NULL default '',
+  `sef` varchar(255) NOT NULL default '',
+  `title` varchar(255) NOT NULL default '',
+  `meta_title` varchar(255) NOT NULL default '',
+  `meta_description` varchar(255) NOT NULL default '',
+  `meta_keywords` varchar(255) NOT NULL default '',
+  `component` varchar(45) NOT NULL default 'com_frontpage',
+  `published` tinyint(1) unsigned NOT NULL default 0,
+  `newmeta_title` varchar(255) NOT NULL default '',
+  `newmeta_description` varchar(255) NOT NULL default '',
+  `newmeta_keywords` varchar(255) NOT NULL default '',
+  `checked_out` int(10) unsigned NOT NULL default 0,
+  `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+  `new_title` varchar(255) NOT NULL default '',
+  `robots_follow` set('follow','nofollow') NOT NULL default 'follow',
+  `robots_index` set('index','noindex') NOT NULL default 'index',
+  `status` set('r','y','g') NOT NULL default 'r',
+  `google_pr` tinyint(2) unsigned NOT NULL default 0,
+  `alexa_pr` int(10) unsigned NOT NULL default 0,
+  `issitemap` tinyint(1) unsigned NOT NULL default 0,
+  `ishidden` tinyint(1) unsigned NOT NULL default 0,
+  `isindexed` tinyint(3) unsigned NOT NULL default 0,
+  `errcode` char(3) NOT NULL default '',
+  `keywords` tinytext,
+  `google_weight` char(4) NOT NULL default '',
+  `hiden_sitemap` int(11) NOT NULL default '0',
+  `changefreq` varchar(50) NOT NULL,
+  `page_size` int(10) unsigned NOT NULL default 0,
+  `images_size` int(10) unsigned NOT NULL default 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`original`)
+);
+
+      ]]></query>
+      <!-- JP SKIPWORDS -->
+      <query id="10"><![CDATA[ DROP TABLE IF EXISTS #__jp_skipwords;]]></query>
+      <query id="11"><![CDATA[ 
+        CREATE TABLE `#__jp_skipwords` (
+          `id` int(10) unsigned NOT NULL auto_increment,
+          `word` varchar(255) NOT NULL default '',
+          PRIMARY KEY  (`id`)
+        );
+      ]]></query>
+      <!-- JP GOOGLE TOOLS -->
+      <query id="12"><![CDATA[ DROP TABLE IF EXISTS #__jp_google_tools;]]></query>
+      <query id="13"><![CDATA[
+          CREATE TABLE `#__jp_google_tools` (
+            `id` int(10) unsigned NOT NULL auto_increment,
+            `name` varchar(55) NOT NULL default '',
+            `date` date NOT NULL default '0000-00-00',
+            `value` varchar(255) NOT NULL default '',
+            PRIMARY KEY  (`id`)
+          );      
+       ]]></query>
+       <query id="14"><![CDATA[
+          INSERT INTO `#__jp_google_tools` (`id`,`name`,`date`,`value`) VALUES 
+           (NULL,'Google Site Map','',''),
+           (NULL,'Homepage Page Rank','',''),
+           (NULL,'Back Links','',''),
+           (NULL,'Google Block','',''),
+           (NULL,'SEF Integrations','','');
+       ]]></query>
+    </queries>
+  </install>
+  
+  <uninstall>
+    <queries>
+      <query id="1"><![CDATA[ DELETE FROM #__je_config WHERE component = 'com_jp';]]></query>
+      <query id="2"><![CDATA[ DROP TABLE IF EXISTS #__jp_images;]]></query>
+      <query id="3"><![CDATA[ DROP TABLE IF EXISTS #__jp_links;]]></query>
+      <query id="4"><![CDATA[ DROP TABLE IF EXISTS #__jp_page_images;]]></query>
+      <query id="5"><![CDATA[ DROP TABLE IF EXISTS #__jp_page_links;]]></query>
+      <query id="6"><![CDATA[ DROP TABLE IF EXISTS #__jp_pages;]]></query>
+      <query id="7"><![CDATA[ DROP TABLE IF EXISTS #__jp_skipwords;]]></query>
+      <query id="8"><![CDATA[ DROP TABLE IF EXISTS #__jp_google_tools;]]></query>
+    </queries>
+  </uninstall>
+  
+  <administration>
+    <menu>JPromoter 2</menu>
+      <submenu>
+        <menu task="panel">Контрольная панель</menu>
+        <menu task="scan">SE Simulation</menu>
+        <menu task="optimize">SEF URLs</menu>
+        <menu task="google">SEO Инструмент</menu>
+        <menu task="config">Конфигурация</menu>
+      </submenu>
+    
+    <files>
+      <filename>WARNING.txt</filename>
+      <filename>index.html</filename>      
+      <filename>sef.php</filename>
+      <filename>jp.sef.php</filename>  
+      <filename>install.jp.php</filename>  
+      <filename>uninstall.jp.php</filename>  
+      <filename>admin.jp.html.php</filename>
+      <filename>admin.jp.php</filename>
+      <filename>jp.functions.php</filename>
+      <filename>jp.class.php</filename>
+      <filename>jp.config.php</filename>
+      <filename>toolbar.jp.php</filename>
+      <filename>toolbar.jp.html.php</filename>
+      <filename>query.php</filename>
+      <filename>google.class.php</filename>
+      <filename>jp.xajax.php</filename>      
+      <filename>xajax/xajax_core/plugin_layer/xajaxDefaultIncludePlugin.inc.php</filename>
+      <filename>xajax/xajax_core/plugin_layer/xajaxDefaultRequestProcessorPlugin.inc.php</filename>
+      <filename>xajax/xajax_core/plugin_layer/xajaxIncludePlugin.inc.php</filename>
+      <filename>xajax/xajax_core/plugin_layer/xajaxPluginManager.inc.php</filename>
+      <filename>xajax/xajax_core/plugin_layer/xajaxRequestProcessorPlugin.inc.php</filename>
+      <filename>xajax/xajax_core/plugin_layer/xajaxResponsePlugin.inc.php</filename>
+      <filename>xajax/xajax_core/legacy.inc.php</filename>
+      <filename>xajax/xajax_core/xajax.inc.php</filename>
+      <filename>xajax/xajax_core/xajaxCompress.inc.php</filename>
+      <filename>xajax/xajax_core/xajaxResponse.inc.php</filename>
+      <filename>xajax/xajax_js/xajax.js</filename>
+      <filename>xajax/xajax_js/xajax_uncompressed.js</filename>
+      <filename>help/index.html</filename>
+      <!-- XML CONFIGS 1 item -->
+      <filename>sef_configs/jp_com_content.xml</filename>
+      <filename>sef_configs/index.html</filename>
+      <!-- XML TRANSLITS 3 item -->
+      <filename>sef_translits/iso-8859-1.ini</filename>
+      <filename>sef_translits/windows-1251.ini</filename>
+      <filename>sef_translits/koi8-r.ini</filename>
+      <filename>sef_translits/utf8.ini</filename>
+      <filename>sef_translits/index.html</filename>
+    </files>
+    <images>
+      <filename>images/preview/no.png</filename>
+      <filename>images/preview/index.html</filename>
+      <filename>images/index.html</filename>
+      <filename>images/accept.png</filename>
+      <filename>images/opendetail_1.gif</filename>
+      <filename>images/cpanel.gif</filename>      
+      <filename>images/cpanel.png</filename>
+      <filename>images/google.png</filename>
+      <filename>images/google16.png</filename>
+      <filename>images/icon16.png</filename>
+      <filename>images/ignore.png</filename>
+      <filename>images/ignore2.png</filename>
+      <filename>images/logo.png</filename>
+      <filename>images/reports.png</filename>
+      <filename>images/refresh.gif</filename>
+      <filename>images/reports16.png</filename>
+      <filename>images/searchtext.gif</filename>
+      <filename>images/searchtext.png</filename>
+      <filename>images/optimize16.gif</filename>
+      <filename>images/analize16.gif</filename>
+      <filename>images/index.gif</filename>
+      <filename>images/noindex.gif</filename>
+      <filename>images/follow.gif</filename>
+      <filename>images/nofollow.gif</filename>                        
+      <filename>images/tick.png</filename>    
+      <filename>images/status_r.png</filename>  
+      <filename>images/status_y.png</filename>  
+      <filename>images/status_g.png</filename>  
+      <filename>images/pagerank.gif</filename>  
+      <filename>images/hide.gif</filename>  
+      <filename>images/sitemap.gif</filename>  
+      <filename>images/spacer.gif</filename>
+      <filename>images/opendetail.png</filename>
+    </images>
+    
+  </administration>
+  <installfile>install.jp.php</installfile>
+  <uninstallfile>uninstall.jp.php</uninstallfile>
+  
+</mosinstall>
