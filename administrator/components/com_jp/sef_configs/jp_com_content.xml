@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sefconfig component="com_content">
+	<!-- 3:57 PM 2008-04-10 -->
+		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" limit="*" limitstart="*" Itemid="*">
+			<tpl>{language}/{table}{menuitem}/page-{pagenumber}.html</tpl>
+		</cond>
+		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" Itemid="*">
+			<tpl>{language}/{table}{menuitem}.html</tpl>
+		</cond>
+		<cond task="category|blogcategory|archivecategory" id="*" limit="*" limitstart="*">
+			<tpl>{language}/{table}{category}/page-{pagenumber}.html</tpl>
+		</cond>
+		<cond task="category|blogcategory|archivecategory" id="*">
+			<tpl>{language}/{table}{category}.html</tpl>
+		</cond>
+		<cond task="section|blogsection|archivesection" id="*" limit="*" limitstart="*">
+			<tpl>{language}/{table}{section}/page-{pagenumber}.html</tpl>
+		</cond>
+		<cond task="section|blogsection|archivesection" id="*">
+			<tpl>{language}/{table}{section}.html</tpl>
+		</cond>
+		<cond task="view" id="*" limit="*" limitstart="*">
+			<tpl>{language}/{content}/page-{pagenumber}.html</tpl>
+		</cond>
+		<cond task="view" id="*">
+			<tpl>{language}/{content}.html</tpl>
+		</cond>
+		<cond task="edit" id="*" Returnid="*">
+			<tpl>{language}/edit/{content}{Returnid}.html</tpl>
+		</cond>
+		<cond task="edit" id="*">
+			<tpl>{language}/edit/{content}.html</tpl>
+		</cond>
+
+		<var name="table" type="query">
+			<query>SELECT IF('{task}' LIKE 'blog%', '', 'table/')</query>
+			<empty></empty>
+		</var>
+		<var name="menuitem" type="query">
+			<query>SELECT LOWER(name) FROM `#__menu` WHERE `id` = {Itemid}</query>
+			<empty>?</empty>
+		</var>
+		<var name="section" type="query">
+			<query>SELECT LOWER(title) FROM `#__sections` WHERE `id` = {id}</query>
+			<empty>?</empty>
+		</var>
+		<var name="category" type="query">
+			<query>SELECT LOWER(CONCAT(s.`title`, '/', ct.title)) FROM `#__categories` AS ct LEFT JOIN `#__sections` AS s on s.id = ct.section WHERE ct.`id` = {id}</query>
+			<empty>?</empty>
+		</var>
+		<var name="content" type="query">
+			<query>SELECT LOWER(IF(c.catid != 0, CONCAT(s.`title`, '/', ct.`title`, '/', c.`title`), c.`title`)) FROM `#__content` AS c LEFT JOIN `#__categories` AS ct ON ct.id = c.catid LEFT JOIN `#__sections` AS s on s.id = c.sectionid WHERE c.`id` = {id}</query>
+			<empty>?</empty>
+		</var>
+		<!--<var name="pagenumber" type="query">
+			<query>SELECT ({limitstart} div {limit}) + 1</query>
+			<empty>?</empty>
+		</var>-->
+		<var name="Returnid" type="string">
+			<value>{Returnid}</value>
+		</var>
+		<var name="language" type="string" ifpresent="lang">
+			<value>/{lang}</value>
+		</var>
+
+</sefconfig>
