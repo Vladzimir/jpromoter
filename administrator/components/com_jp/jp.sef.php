@@ -8,48 +8,26 @@
  * Для получения информации о используемых расширениях и замечаний об авторском праве, смотрите файл help/copyright.php.
  */
 
-defined('_VALID_MOS') or die('������ �������� !');
-$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);
+defined('_VALID_MOS') or die();
+$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);//Здесь сделать проверку на использование mod_rewrite и наличие if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 $fst = preg_quote("&gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 $fst = preg_quote("?gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 
-$currCodepage = JEConfig::get('SEF.jp_codepage', 'com_jp');
-
-$translitINIFile = $GLOBALS['mosConfig_absolute_path'] .
-    '/administrator/components/com_jp/sef_translits/' . $currCodepage . '.ini';
-
-$temp = parse_ini_file($translitINIFile, true);
-$jpIsMbyte = true;
-$jpEncoding = 'UTF-8';
-
-$replacedLetters = array();
-
-foreach ($temp['chars'] as $from => $to) {
-    $replacedLetters[$from] = $to;
-}
+$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp');//isset($temp['options']['encoding']) ? $temp['options']['encoding'] : 'UTF-8';
+//$urlTranslit = JEConfig::get('SEF.jp_url_translit', 'com_jp');
+//define('NO_MOD_REWRITE', '/index.php' );
 
 function urlTranslit($string)
 {
-    if ($GLOBALS['jpIsMbyte']) {
-        $string = utf8::strtolower($string, $GLOBALS['jpEncoding']);
-        //$string = strtr($string, $GLOBALS['replacedLetters']);
-       /* $string = preg_replace('/[^\pL\/]+/u', '-', $string);
-        $string = preg_replace('/-\//u', '/', $string);
-        $string = preg_replace('/\/-/u', '/', $string);*/
-        $string = utf8::str_ireplace(' ', '-', $string);
-        $string = utf8::str_ireplace('-/', '/', $string);
-        $string = utf8::str_ireplace('/-', '/', $string);
-        $string = trim($string, '-');
-    } else {
-        // $string = strtolower($string);
-        $string = strtr($string, $GLOBALS['replacedLetters']);
-        $string = preg_replace('/[^\w\/]+/', '-', $string);
-        $string = preg_replace('/-\//', '/', $string);
-        $string = preg_replace('/\/-/', '/', $string);
-        $string = trim($string, '-');
-    }
+    $replacedLetters = array(); //Таблица транслитерации
+    $string = Jstring::strtolower($string);
+    //$string = Jstring::strtr($string, $replacedLetters);
+    $string = preg_replace('/[^\p{L}\p{Nd}\/0-9]+/u', '-', $string); //http://habrahabr.ru/blogs/php/45910/
+    $string = preg_replace('/-\//u', '/', $string);
+    $string = preg_replace('/\/-/u', '/', $string);
+    $string = Jstring::trim($string, '-');
     return $string;
 }
 
@@ -63,27 +41,10 @@ if ($mosConfig_sef) {
 
     $foundURL = false;
     $Exclusion = array();
-    /* boston, странное действие
-    $sefConfigs = array();
-    $database->setQuery('SELECT name
-    FROM #__je_config 
-    WHERE component = "com_jp" AND section = "Component" AND selected=1');
-    $result = $database->loadAssocList();
-    $Exclusion[1] = "com_exaple312";
-    $_i = 2;
-    foreach ($result as $row){
-    $Exclusion[$_i] = $row["name"];
-    $_i++;
-    }
-    */
-
-    $database->setQuery('SELECT p.original , p.sef , c.selected
-						FROM #__jp_pages as p  
-						LEFT JOIN #__je_config as c ON p.component = c.name');
+    $database->setQuery('SELECT original, sef FROM #__jp_pages');
     $originalAndSefUrls = $database->loadAssocList('original');
 
-
-    if (utf8::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
+    if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 
         $inURL = $_SERVER['REQUEST_URI'];
 
@@ -94,15 +55,15 @@ if ($mosConfig_sef) {
             $sitePath = '';
         }
 
-        $inURL = utf8::substr($inURL, utf8::strlen($sitePath));
+        $inURL = Jstring::substr($inURL, Jstring::strlen($sitePath));
 
         $fragment = '';
 
-        $sharpPos = utf8::strpos($inURL, '#');
+        $sharpPos = Jstring::strpos($inURL, '#');
 
         if ($sharpPos !== false) {
-            $fragment = utf8::substr($inURL, $sharpPos);
-            $inURL = utf8::substr($inURL, 0, $sharpPos);
+            $fragment = Jstring::substr($inURL, $sharpPos);
+            $inURL = Jstring::substr($inURL, 0, $sharpPos);
         }
 
         foreach ($originalAndSefUrls as $orAndSef) {
@@ -125,7 +86,7 @@ if ($mosConfig_sef) {
 
                     $_SERVER['QUERY_STRING'] = $pUrl['query'];
 
-                    mb_parse_str($pUrl['query'], $pQuery);
+                    parse_str($pUrl['query'], $pQuery);
 
                     $_REQUEST = $_REQUEST + $pQuery;
                     $_GET = $_GET + $pQuery;
@@ -137,23 +98,6 @@ if ($mosConfig_sef) {
                 break;
             }
         }
-        /*
-        if ((! $foundURL) and ($inURL != '/')) {
-
-        $pInURL = parse_url($inURL);
-        if (isset($pInURL['query'])) {
-        mb_parse_str($pInURL['query'], $args);
-        };
-
-        if (empty($args['option'])) {
-        header( 'HTTP/1.0 404 Not Found' );
-        require_once( $mosConfig_absolute_path . '/templates/404.php' );
-        exit( 404 );
-        }
-        }
-        */
-
-
     }
 
     $_MAMBOTS->trigger('jpAfterSEF', null);
@@ -167,392 +111,103 @@ if ($mosConfig_sef and (!$foundURL)) {
 
     $url_array = explode('/', $_SERVER['REQUEST_URI']);
 
+    if (in_array('component', $url_array)) {
 
-    if (in_array('content', $url_array)) {
+        /*
+        Components
+        http://www.domain.com/component/$name,$value
+        */
+        $uri = explode('component/', $_SERVER['REQUEST_URI']);
+        $uri_array = explode('/', $uri[1]);
+        $QUERY_STRING = '';
 
-        /**
-         * Content
-         * http://www.domain.com/$option/$task/$sectionid/$id/$Itemid/$limit/$limitstart
-         */
-
-        $uri = explode('content/', $_SERVER['REQUEST_URI']);
-        $option = 'com_content';
-        $_GET['option'] = $option;
-        $_REQUEST['option'] = $option;
-        $pos = array_search('content', $url_array);
-
-        // language hook for content
-        $lang = '';
-        foreach ($url_array as $key => $value) {
-            if (!strcasecmp(utf8::substr($value, 0, 5), 'lang,')) {
-                $temp = explode(',', $value);
-                if (isset($temp[0]) && $temp[0] != '' && isset($temp[1]) && $temp[1] != '') {
-                    $_GET['lang'] = $temp[1];
-                    $_REQUEST['lang'] = $temp[1];
-                    $lang = $temp[1];
+        // needed for check if component exists
+        $path = $mosConfig_absolute_path . '/components';
+        $dirlist = array();
+        if (is_dir($path)) {
+            $base = opendir($path);
+            while (false !== ($dir = readdir($base))) {
+                if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $dir) && strtolower($dir)
+                    !== 'cvs' && strtolower($dir) !== '.svn') {
+                    $dirlist[] = $dir;
                 }
-                unset($url_array[$key]);
             }
+            closedir($base);
         }
 
-        if (isset($url_array[$pos + 8]) && $url_array[$pos + 8] != '' && in_array('category',
-            $url_array) && (utf8::strpos($url_array[$pos + 5], 'order,') !== false) && (utf8::strpos($url_array[$pos +
-            6], 'filter,') !== false)) {
-            // $option/$task/$sectionid/$id/$Itemid/$order/$filter/$limit/$limitstart
-            $task = $url_array[$pos + 1];
-            $sectionid = $url_array[$pos + 2];
-            $id = $url_array[$pos + 3];
-            $Itemid = $url_array[$pos + 4];
-            $order = utf8::str_ireplace('order,', '', $url_array[$pos + 5]);
-            $filter = utf8::str_ireplace('filter,', '', $url_array[$pos + 6]);
-            $limit = $url_array[$pos + 7];
-            $limitstart = $url_array[$pos + 8];
+        foreach ($uri_array as $value) {
+            $temp = explode(',', $value);
+            if (isset($temp[0]) && $temp[0] != '' && isset($temp[1]) && $temp[1] != '') {
+                $_GET[$temp[0]] = $temp[1];
+                $_REQUEST[$temp[0]] = $temp[1];
 
-            // pass data onto global variables
-            $_GET['task'] = $task;
-            $_REQUEST['task'] = $task;
-            $_GET['sectionid'] = $sectionid;
-            $_REQUEST['sectionid'] = $sectionid;
-            $_GET['id'] = $id;
-            $_REQUEST['id'] = $id;
-            $_GET['Itemid'] = $Itemid;
-            $_REQUEST['Itemid'] = $Itemid;
-            $_GET['order'] = $order;
-            $_REQUEST['order'] = $order;
-            $_GET['filter'] = $filter;
-            $_REQUEST['filter'] = $filter;
-            $_GET['limit'] = $limit;
-            $_REQUEST['limit'] = $limit;
-            $_GET['limitstart'] = $limitstart;
-            $_REQUEST['limitstart'] = $limitstart;
+                // check to ensure component actually exists
+                if ($temp[0] == 'option') {
+                    $check = '';
+                    if (count($dirlist)) {
+                        foreach ($dirlist as $dir) {
+                            if ($temp[1] == $dir) {
+                                $check = 1;
+                                break;
+                            }
+                        }
+                    }
+                    // redirect to 404 page if no component found to match url
+                    if (!$check) {
+                        header('HTTP/1.0 404 Not Found');
+                        require_once ($mosConfig_absolute_path . '/templates/404.php');
+                        exit(404);
+                    }
+                }
 
-            $QUERY_STRING = "option=com_content&task=$task&sectionid=$sectionid&id=$id&Itemid=$Itemid&order=$order&filter=$filter&limit=$limit&limitstart=$limitstart";
-        } else
-            if (isset($url_array[$pos + 7]) && $url_array[$pos + 7] != '' && $url_array[$pos +
-                5] > 1000 && (in_array('archivecategory', $url_array) || in_array('archivesection',
-                $url_array))) {
-                // $option/$task/$id/$limit/$limitstart/year/month/module
-                $task = $url_array[$pos + 1];
-                $id = $url_array[$pos + 2];
-                $limit = $url_array[$pos + 3];
-                $limitstart = $url_array[$pos + 4];
-                $year = $url_array[$pos + 5];
-                $month = $url_array[$pos + 6];
-                $module = $url_array[$pos + 7];
-
-                // pass data onto global variables
-                $_GET['task'] = $task;
-                $_REQUEST['task'] = $task;
-                $_GET['id'] = $id;
-                $_REQUEST['id'] = $id;
-                $_GET['limit'] = $limit;
-                $_REQUEST['limit'] = $limit;
-                $_GET['limitstart'] = $limitstart;
-                $_REQUEST['limitstart'] = $limitstart;
-                $_GET['year'] = $year;
-                $_REQUEST['year'] = $year;
-                $_GET['month'] = $month;
-                $_REQUEST['month'] = $month;
-                $_GET['module'] = $module;
-                $_REQUEST['module'] = $module;
-
-                $QUERY_STRING = "option=com_content&task=$task&id=$id&limit=$limit&limitstart=$limitstart&year=$year&month=$month&module=$module";
-            } else
-                if (isset($url_array[$pos + 7]) && $url_array[$pos + 7] != '' && $url_array[$pos +
-                    6] > 1000 && (in_array('archivecategory', $url_array) || in_array('archivesection',
-                    $url_array))) {
-                    // $option/$task/$id/$Itemid/$limit/$limitstart/year/month
-                    $task = $url_array[$pos + 1];
-                    $id = $url_array[$pos + 2];
-                    $Itemid = $url_array[$pos + 3];
-                    $limit = $url_array[$pos + 4];
-                    $limitstart = $url_array[$pos + 5];
-                    $year = $url_array[$pos + 6];
-                    $month = $url_array[$pos + 7];
-
-                    // pass data onto global variables
-                    $_GET['task'] = $task;
-                    $_REQUEST['task'] = $task;
-                    $_GET['id'] = $id;
-                    $_REQUEST['id'] = $id;
-                    $_GET['Itemid'] = $Itemid;
-                    $_REQUEST['Itemid'] = $Itemid;
-                    $_GET['limit'] = $limit;
-                    $_REQUEST['limit'] = $limit;
-                    $_GET['limitstart'] = $limitstart;
-                    $_REQUEST['limitstart'] = $limitstart;
-                    $_GET['year'] = $year;
-                    $_REQUEST['year'] = $year;
-                    $_GET['month'] = $month;
-                    $_REQUEST['month'] = $month;
-
-                    $QUERY_STRING = "option=com_content&task=$task&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart&year=$year&month=$month";
-                } else
-                    if (isset($url_array[$pos + 7]) && $url_array[$pos + 7] != '' && in_array('category',
-                        $url_array) && (utf8::strpos($url_array[$pos + 5], 'order,') !== false)) {
-                        // $option/$task/$sectionid/$id/$Itemid/$order/$limit/$limitstart
-                        $task = $url_array[$pos + 1];
-                        $sectionid = $url_array[$pos + 2];
-                        $id = $url_array[$pos + 3];
-                        $Itemid = $url_array[$pos + 4];
-                        $order = utf8::str_ireplace('order,', '', $url_array[$pos + 5]);
-                        $limit = $url_array[$pos + 6];
-                        $limitstart = $url_array[$pos + 7];
-
-                        // pass data onto global variables
-                        $_GET['task'] = $task;
-                        $_REQUEST['task'] = $task;
-                        $_GET['sectionid'] = $sectionid;
-                        $_REQUEST['sectionid'] = $sectionid;
-                        $_GET['id'] = $id;
-                        $_REQUEST['id'] = $id;
-                        $_GET['Itemid'] = $Itemid;
-                        $_REQUEST['Itemid'] = $Itemid;
-                        $_GET['order'] = $order;
-                        $_REQUEST['order'] = $order;
-                        $_GET['limit'] = $limit;
-                        $_REQUEST['limit'] = $limit;
-                        $_GET['limitstart'] = $limitstart;
-                        $_REQUEST['limitstart'] = $limitstart;
-
-                        $QUERY_STRING = "option=com_content&task=$task&sectionid=$sectionid&id=$id&Itemid=$Itemid&order=$order&limit=$limit&limitstart=$limitstart";
-                    } else
-                        if (isset($url_array[$pos + 6]) && $url_array[$pos + 6] != '') {
-                            // $option/$task/$sectionid/$id/$Itemid/$limit/$limitstart
-                            $task = $url_array[$pos + 1];
-                            $sectionid = $url_array[$pos + 2];
-                            $id = $url_array[$pos + 3];
-                            $Itemid = $url_array[$pos + 4];
-                            $limit = $url_array[$pos + 5];
-                            $limitstart = $url_array[$pos + 6];
-
-                            // pass data onto global variables
-                            $_GET['task'] = $task;
-                            $_REQUEST['task'] = $task;
-                            $_GET['sectionid'] = $sectionid;
-                            $_REQUEST['sectionid'] = $sectionid;
-                            $_GET['id'] = $id;
-                            $_REQUEST['id'] = $id;
-                            $_GET['Itemid'] = $Itemid;
-                            $_REQUEST['Itemid'] = $Itemid;
-                            $_GET['limit'] = $limit;
-                            $_REQUEST['limit'] = $limit;
-                            $_GET['limitstart'] = $limitstart;
-                            $_REQUEST['limitstart'] = $limitstart;
-
-                            $QUERY_STRING = "option=com_content&task=$task&sectionid=$sectionid&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart";
-                        } else
-                            if (isset($url_array[$pos + 5]) && $url_array[$pos + 5] != '') {
-                                // $option/$task/$id/$Itemid/$limit/$limitstart
-                                $task = $url_array[$pos + 1];
-                                $id = $url_array[$pos + 2];
-                                $Itemid = $url_array[$pos + 3];
-                                $limit = $url_array[$pos + 4];
-                                $limitstart = $url_array[$pos + 5];
-
-                                // pass data onto global variables
-                                $_GET['task'] = $task;
-                                $_REQUEST['task'] = $task;
-                                $_GET['id'] = $id;
-                                $_REQUEST['id'] = $id;
-                                $_GET['Itemid'] = $Itemid;
-                                $_REQUEST['Itemid'] = $Itemid;
-                                $_GET['limit'] = $limit;
-                                $_REQUEST['limit'] = $limit;
-                                $_GET['limitstart'] = $limitstart;
-                                $_REQUEST['limitstart'] = $limitstart;
-
-                                $QUERY_STRING = "option=com_content&task=$task&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart";
-                            } else
-                                if (isset($url_array[$pos + 4]) && $url_array[$pos + 4] != '' && (in_array('archivecategory',
-                                    $url_array) || in_array('archivesection', $url_array))) {
-                                    // $option/$task/$year/$month/$module
-                                    $task = $url_array[$pos + 1];
-                                    $year = $url_array[$pos + 2];
-                                    $month = $url_array[$pos + 3];
-                                    $module = $url_array[$pos + 4];
-
-                                    // pass data onto global variables
-                                    $_GET['task'] = $task;
-                                    $_REQUEST['task'] = $task;
-                                    $_GET['year'] = $year;
-                                    $_REQUEST['year'] = $year;
-                                    $_GET['month'] = $month;
-                                    $_REQUEST['month'] = $month;
-                                    $_GET['module'] = $module;
-                                    $_REQUEST['module'] = $module;
-
-                                    $QUERY_STRING = "option=com_content&task=$task&year=$year&month=$month&module=$module";
-                                } else
-                                    if (!(isset($url_array[$pos + 5]) && $url_array[$pos + 5] != '') && isset($url_array[$pos +
-                                        4]) && $url_array[$pos + 4] != '') {
-                                        // $option/$task/$sectionid/$id/$Itemid
-                                        $task = $url_array[$pos + 1];
-                                        $sectionid = $url_array[$pos + 2];
-                                        $id = $url_array[$pos + 3];
-                                        $Itemid = $url_array[$pos + 4];
-
-                                        // pass data onto global variables
-                                        $_GET['task'] = $task;
-                                        $_REQUEST['task'] = $task;
-                                        $_GET['sectionid'] = $sectionid;
-                                        $_REQUEST['sectionid'] = $sectionid;
-                                        $_GET['id'] = $id;
-                                        $_REQUEST['id'] = $id;
-                                        $_GET['Itemid'] = $Itemid;
-                                        $_REQUEST['Itemid'] = $Itemid;
-
-                                        $QUERY_STRING = "option=com_content&task=$task&sectionid=$sectionid&id=$id&Itemid=$Itemid";
-                                    } else
-                                        if (!(isset($url_array[$pos + 4]) && $url_array[$pos + 4] != '') && (isset($url_array[$pos +
-                                            3]) && $url_array[$pos + 3] != '')) {
-                                            // $option/$task/$id/$Itemid
-                                            $task = $url_array[$pos + 1];
-                                            $id = $url_array[$pos + 2];
-                                            $Itemid = $url_array[$pos + 3];
-
-                                            // pass data onto global variables
-                                            $_GET['task'] = $task;
-                                            $_REQUEST['task'] = $task;
-                                            $_GET['id'] = $id;
-                                            $_REQUEST['id'] = $id;
-                                            $_GET['Itemid'] = $Itemid;
-                                            $_REQUEST['Itemid'] = $Itemid;
-
-                                            $QUERY_STRING = "option=com_content&task=$task&id=$id&Itemid=$Itemid";
-                                        } else
-                                            if (!(isset($url_array[$pos + 3]) && $url_array[$pos + 3] != '') && (isset($url_array[$pos +
-                                                2]) && $url_array[$pos + 2] != '')) {
-                                                // $option/$task/$id
-                                                $task = $url_array[$pos + 1];
-                                                $id = $url_array[$pos + 2];
-
-                                                // pass data onto global variables
-                                                $_GET['task'] = $task;
-                                                $_REQUEST['task'] = $task;
-                                                $_GET['id'] = $id;
-                                                $_REQUEST['id'] = $id;
-
-                                                $QUERY_STRING = "option=com_content&task=$task&id=$id";
-                                            } else
-                                                if (!(isset($url_array[$pos + 2]) && $url_array[$pos + 2] != '') && (isset($url_array[$pos +
-                                                    1]) && $url_array[$pos + 1] != '')) {
-                                                    // $option/$task
-                                                    $task = $url_array[$pos + 1];
-
-                                                    $_GET['task'] = $task;
-                                                    $_REQUEST['task'] = $task;
-
-                                                    $QUERY_STRING = 'option=com_content&task=' . $task;
-                                                }
-
-        if ($lang != '') {
-            $QUERY_STRING .= '&amp;lang=' . $lang;
+                if ($QUERY_STRING == '') {
+                    $QUERY_STRING .= "$temp[0]=$temp[1]";
+                } else {
+                    $QUERY_STRING .= "&$temp[0]=$temp[1]";
+                }
+            }
         }
 
         $_SERVER['QUERY_STRING'] = $QUERY_STRING;
         $REQUEST_URI = $uri[0] . 'index.php?' . $QUERY_STRING;
         $_SERVER['REQUEST_URI'] = $REQUEST_URI;
 
-    } else
-        if (in_array('component', $url_array)) {
-
-            /*
-            Components
-            http://www.domain.com/component/$name,$value
-            */
-            $uri = explode('component/', $_SERVER['REQUEST_URI']);
-            $uri_array = explode('/', $uri[1]);
-            $QUERY_STRING = '';
-
-            // needed for check if component exists
-            $path = $mosConfig_absolute_path . '/components';
-            $dirlist = array();
-            if (is_dir($path)) {
-                $base = opendir($path);
-                while (false !== ($dir = readdir($base))) {
-                    if ($dir !== '.' && $dir !== '..' && is_dir($path . '/' . $ir) && utf8::strtolower($dir)
-                        !== 'cvs' && utf8::strtolower($dir) !== '.svn') {
-                        $dirlist[] = $dir;
-                    }
-                }
-                closedir($base);
-            }
-
-            foreach ($uri_array as $value) {
-                $temp = explode(',', $value);
-                if (isset($temp[0]) && $temp[0] != '' && isset($temp[1]) && $temp[1] != '') {
-                    $_GET[$temp[0]] = $temp[1];
-                    $_REQUEST[$temp[0]] = $temp[1];
-
-                    // check to ensure component actually exists
-                    if ($temp[0] == 'option') {
-                        $check = '';
-                        if (count($dirlist)) {
-                            foreach ($dirlist as $dir) {
-                                if ($temp[1] == $dir) {
-                                    $check = 1;
-                                    break;
-                                }
-                            }
-                        }
-                        // redirect to 404 page if no component found to match url
-                        if (!$check) {
-                            header('HTTP/1.0 404 Not Found');
-                            require_once ($mosConfig_absolute_path . '/templates/404.php');
-                            exit(404);
-                        }
-                    }
-
-                    if ($QUERY_STRING == '') {
-                        $QUERY_STRING .= "$temp[0]=$temp[1]";
-                    } else {
-                        $QUERY_STRING .= "&$temp[0]=$temp[1]";
-                    }
+        if (defined('RG_EMULATION') && RG_EMULATION == 1) {
+            // Extract to globals
+            while (list($key, $value) = each($_GET)) {
+                if ($key != "GLOBALS") {
+                    $GLOBALS[$key] = $value;
                 }
             }
+            // Don't allow config vars to be passed as global
+            include ('configuration.php');
 
-            $_SERVER['QUERY_STRING'] = $QUERY_STRING;
-            $REQUEST_URI = $uri[0] . 'index.php?' . $QUERY_STRING;
-            $_SERVER['REQUEST_URI'] = $REQUEST_URI;
-
-            if (defined('RG_EMULATION') && RG_EMULATION == 1) {
-                // Extract to globals
-                while (list($key, $value) = each($_GET)) {
-                    if ($key != "GLOBALS") {
-                        $GLOBALS[$key] = $value;
-                    }
-                }
-                // Don't allow config vars to be passed as global
-                include ('configuration.php');
-
-                // SSL check - $http_host returns <live site url>:<port number if it is 443>
-                $http_host = explode(':', $_SERVER['HTTP_HOST']);
-                if ((!empty($_SERVER['HTTPS']) && utf8::strtolower($_SERVER['HTTPS']) != 'off' ||
-                    isset($http_host[1]) && $http_host[1] == 443) && utf8::substr($mosConfig_live_site, 0,
-                    8) != 'https://') {
-                    $mosConfig_live_site = 'https://' . utf8::substr($mosConfig_live_site, 7);
-                }
-            }
-
-        } else {
-
-            /*
-            Unknown content
-            http://www.domain.com/unknown
-            */
-            $jdir = utf8::str_ireplace('index.php', '', $_SERVER['PHP_SELF']);
-            $juri = utf8::str_ireplace($jdir, '', $_SERVER['REQUEST_URI']);
-
-            if ($juri != '' && $juri != '/' && !mb_eregi("index\.php", $_SERVER['REQUEST_URI']) &&
-                !mb_eregi("index2\.php", $_SERVER['REQUEST_URI']) && !mb_eregi("/\?", $_SERVER['REQUEST_URI']) &&
-                $_SERVER['QUERY_STRING'] == '') {
-                header('HTTP/1.0 404 Not Found');
-                //echo $_SERVER['REQUEST_URI'];
-                require_once ($mosConfig_absolute_path . '/templates/system/404.php');
-                exit(404);
+            // SSL check - $http_host returns <live site url>:<port number if it is 443>
+            $http_host = explode(':', $_SERVER['HTTP_HOST']);
+            if ((!empty($_SERVER['HTTPS']) && Jstring::strtolower($_SERVER['HTTPS']) !=
+                'off' || isset($http_host[1]) && $http_host[1] == 443) && Jstring::substr($mosConfig_live_site,
+                0, 8) != 'https://') {
+                $mosConfig_live_site = 'https://' . Jstring::substr($mosConfig_live_site, 7);
             }
         }
+
+    } else {
+
+        /*
+        Unknown content
+        http://www.domain.com/unknown
+        */
+        $jdir = Jstring::str_ireplace('index.php', '', $_SERVER['PHP_SELF']);
+        $juri = Jstring::str_ireplace($jdir, '', $_SERVER['REQUEST_URI']);
+
+        if ($juri != '' && $juri != '/' && !mb_eregi("index\.php", $_SERVER['REQUEST_URI']) &&
+            !mb_eregi("index2\.php", $_SERVER['REQUEST_URI']) && !mb_eregi("/\?", $_SERVER['REQUEST_URI']) &&
+            $_SERVER['QUERY_STRING'] == '') {
+            header('HTTP/1.0 404 Not Found');
+            require_once ($mosConfig_absolute_path . '/templates/system/404.php');
+            exit(404);
+        }
+    }
 }
 
 
@@ -566,28 +221,28 @@ function sefRelToAbs($string)
     global $mosConfig_live_site, $mosConfig_sef, $mosConfig_multilingual_support;
     global $iso_client_lang, $_MAMBOTS;
 
-    if (utf8::strpos($string, '.value') !== false)
+    if (Jstring::strpos($string, '.value') !== false)
         return $string;
 
     $_MAMBOTS->trigger('jpOnURLGenerate', $string);
 
-    if (utf8::substr($string, 0, utf8::strlen($mosConfig_live_site)) == $mosConfig_live_site) {
-        $string = utf8::substr($string, utf8::strlen($mosConfig_live_site));
+    if (Jstring::substr($string, 0, Jstring::strlen($mosConfig_live_site)) == $mosConfig_live_site) {
+        $string = Jstring::substr($string, Jstring::strlen($mosConfig_live_site));
     }
 
-    $string = ltrim($string, '/');
+    $string = Jstring::ltrim($string, '/');
 
 
     //multilingual code url support
     if ($mosConfig_sef && $mosConfig_multilingual_support && $string != 'index.php' &&
-        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(utf8::substr($string, 0, 9),
-        'index.php') && !mb_eregi('lang=', $string)) {
+        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(Jstring::substr($string, 0,
+        9), 'index.php') && !mb_eregi('lang=', $string)) {
         $string .= '&amp;lang=' . $iso_client_lang;
     }
 
     // SEF URL Handling
-    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(utf8::substr($string,
-        0, 9), 'index.php')) {
+    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(Jstring::
+        substr($string, 0, 9), 'index.php')) {
         // Replace all &amp; with &
         $string = str_replace('&amp;', '&', $string);
 
@@ -618,46 +273,23 @@ function sefRelToAbs($string)
             $originalURL = '/' . $string;
 
 
-            $sharpPos = utf8::strpos($originalURL, '#');
+            $sharpPos = Jstring::strpos($originalURL, '#');
 
             if ($sharpPos !== false) {
-                $originalURL = utf8::substr($originalURL, 0, $sharpPos);
+                $originalURL = Jstring::substr($originalURL, 0, $sharpPos);
             }
-
-
-            //echo $originalURL = '/index.php?option=com_xmap&Itemid=27';
-
 
             $_to_insert = false;
             if (isset($originalAndSefUrls[$originalURL])) {
-                if ($originalAndSefUrls[$originalURL]['sef'] != '' && $originalAndSefUrls[$originalURL]['selected'] ==
-                    1) {
-                    return $mosConfig_live_site . $originalAndSefUrls[$originalURL]['original'] . $fragment;
-                } elseif ($originalAndSefUrls[$originalURL]['sef'] != '' && $originalAndSefUrls[$originalURL]['selected'] ==
-                0) {
-                    return $mosConfig_live_site . $originalAndSefUrls[$originalURL]['sef'] . $fragment;
+                if ($originalAndSefUrls[$originalURL]['sef'] != '') {
+                    return $mosConfig_live_site .
+                    //'/index.php'. 
+                    $originalAndSefUrls[$originalURL]['sef'] . $fragment;
                 }
             } else {
                 $_to_insert = true;
-                ;
             }
 
-            //exit();
-            /*
-            foreach ($originalAndSefUrls as $orAndSef) {
-            //jd_inc('jp');
-            if ($orAndSef['original'] == $originalURL ){
-            if ($orAndSef['sef'] == ''){
-            $isEmptySEF = true;
-            break;
-            }elseif($orAndSef['selected'] == 1){
-            return $mosConfig_live_site . $orAndSef['original'] . $fragment;
-            }else{
-            return $mosConfig_live_site . $orAndSef['sef'] . $fragment;
-            }
-            }
-            }
-            */
         }
 
         // JPromoter END ---------------------------------------------------------------
@@ -665,17 +297,17 @@ function sefRelToAbs($string)
         // check if link contained a query component
         if (isset($url['query'])) {
             // special handling for javascript
-            $url['query'] = stripslashes(utf8::str_ireplace('+', '%2b', $url['query']));
+            $url['query'] = stripslashes(Jstring::str_ireplace('+', '%2b', $url['query']));
             // clean possible xss attacks
             $url['query'] = preg_replace("'%3Cscript[^%3E]*%3E.*?%3C/script%3E'si", '', $url['query']);
 
             // break url into component parts
-            mb_parse_str($url['query'], $parts);
+            parse_str($url['query'], $parts);
 
             // special handling for javascript
             foreach ($parts as $key => $value) {
-                if (utf8::strpos($value, '+') !== false) {
-                    $parts[$key] = stripslashes(utf8::str_ireplace('%2b', '+', $value));
+                if (Jstring::strpos($value, '+') !== false) {
+                    $parts[$key] = stripslashes(Jstring::str_ireplace('%2b', '+', $value));
                 }
             }
             //var_dump($parts);
@@ -744,19 +376,19 @@ function sefRelToAbs($string)
                 // all other components
                 // index.php?option=com_xxxx &...
             } else
-                if (isset($parts['option']) && (utf8::strpos($parts['option'], 'com_') !== false)) {
+                if (isset($parts['option']) && (Jstring::strpos($parts['option'], 'com_') !== false)) {
                     // do not SEF where com_content - `edit` or `new` task link
                     if (!(($parts['option'] == 'com_content') && ((isset($parts['task']) == 'new') ||
                         (isset($parts['task']) == 'edit')))) {
                         $sefstring = 'component/';
 
                         foreach ($parts as $key => $value) {
-                            // remove slashes automatically added by mb_parse_str
+                            // remove slashes automatically added by parse_str
                             $value = stripslashes($value);
                             $sefstring .= $key . ',' . $value . '/';
                         }
 
-                        $string = utf8::str_ireplace('=', ',', $sefstring);
+                        $string = Jstring::str_ireplace('=', ',', $sefstring);
                     }
                 }
             // no query given. Empty $string to get only the fragment
@@ -776,7 +408,9 @@ function sefRelToAbs($string)
 
         if (isset($parts['option']) && array_search($parts['option'], $Exclusion)) {
 
-            return $mosConfig_live_site . $originalURL . $fragment;
+            return $mosConfig_live_site . 
+            //'/index.php'.
+            $originalURL . $fragment;
         }
 
         $resultUrl = '';
@@ -788,7 +422,7 @@ function sefRelToAbs($string)
             global $sefConfigs;
 
             // ������ imit=' + this.options[selectedIndex].value + '
-            mb_parse_str($urlComponents['query'], $urlQuery);
+            parse_str($urlComponents['query'], $urlQuery);
 
             // ��������, ����� �������������� ���� ������ �� �����, ��� ���������� ��� �������� � �������
             //        $tempArray = explode('&', $urlComponents['query']);
@@ -915,7 +549,7 @@ function sefRelToAbs($string)
                         switch ($var['type']) {
                             case 'query':
 
-                                $var['query'] = utf8::str_ireplace($searchArray, array_values($urlArgumentList), $var['query']);
+                                $var['query'] = str_ireplace($searchArray, array_values($urlArgumentList), $var['query']);
 
                                 static $_pach;
 
@@ -927,8 +561,8 @@ function sefRelToAbs($string)
                                 $val = $_pach[$var['query']];
 
                                 if (empty($val)) {
-                                    $rnd = utf8::substr(md5(mt_rand(1, 1000)), 0, 16);
-                                    $val = utf8::str_ireplace('?', $rnd, $var['empty']);
+                                    $rnd = Jstring::substr(md5(mt_rand(1, 1000)), 0, 16);
+                                    $val = Jstring::str_ireplace('?', $rnd, $var['empty']);
                                 }
 
                                 $sefConfigs[$comp]['values']['values'][] = urlTranslit($val);
@@ -936,7 +570,7 @@ function sefRelToAbs($string)
                                 break;
                             case 'string':
 
-                                $sefConfigs[$comp]['values']['values'][] = urlTranslit(utf8::str_ireplace($searchArray,
+                                $sefConfigs[$comp]['values']['values'][] = urlTranslit(str_ireplace($searchArray,
                                     array_values($urlArgumentList), $var['value']));
 
                                 break;
@@ -960,7 +594,7 @@ function sefRelToAbs($string)
 
                         if (array_intersect_assoc($cond['arguments'], $urlArgumentList) == $cond['arguments']) {
 
-                            $resultUrl = utf8::str_ireplace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
+                            $resultUrl = str_ireplace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
                                 $cond['tpl']);
 
                             break;
@@ -974,8 +608,6 @@ function sefRelToAbs($string)
         if ($resultUrl == '')
             $resultUrl = '/' . $string;
 
-        //$resultUrl = strtolower($resultUrl);
-
         $originalAndSefUrls[] = array('original' => $originalURL, 'sef' => $resultUrl);
 
         $fst = preg_quote("option=");
@@ -987,19 +619,21 @@ function sefRelToAbs($string)
         } else {
             $_comp = mosGetParam($_REQUEST, 'option', null);
         }
-        $comp = isset($comp) ? $comp : 'com_frontpage';
+        $comp = isset($comp) ? $comp : 'com_frontpage';//Проверка если нет оптион то эту ссылку писать в базу не надо
 
         static $_insert;
         if (!isset($_insert[$resultUrl])) {
             $sql = 'INSERT INTO #__jp_pages (original, sef, component)' . ' VALUES ("' . $database->
-                getEscaped($originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
-                $_comp . '")' . ' ON DUPLICATE KEY UPDATE `sef`="' . $database->getEscaped($resultUrl) .
-                '";';
+            getEscaped($originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
+            $_comp . '")' . ' ON DUPLICATE KEY UPDATE `sef`="' . $database->getEscaped($resultUrl) .
+            '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
         }
 
-        return $mosConfig_live_site . $resultUrl . $fragment;
+        return $mosConfig_live_site . 
+        //'/index.php'.
+        $resultUrl . $fragment;
 
         // JPromoter END -------------------------------------------------------------
 
@@ -1013,7 +647,7 @@ function sefRelToAbs($string)
     } else {
         // Handling for when SEF is not activated
         // Relative link handling
-        if ((utf8::strpos($string, $mosConfig_live_site) !== 0)) {
+        if ((Jstring::strpos($string, $mosConfig_live_site) !== 0)) {
             // if URI starts with a "/", means URL is at the root of the host...
             if (strncmp($string, '/', 1) == 0) {
                 // splits http(s)://xx.xx/yy/zz..." into [1]="http(s)://xx.xx" and [2]="/yy/zz...":
@@ -1030,7 +664,7 @@ function sefRelToAbs($string)
                 $url_schemes[] = 'https:';
 
                 foreach ($url_schemes as $url) {
-                    if (utf8::strpos($string, $url) === 0) {
+                    if (Jstring::strpos($string, $url) === 0) {
                         $check = 0;
                     }
                 }
@@ -1044,4 +678,3 @@ function sefRelToAbs($string)
         return $string;
     }
 }
-//unset($originalAndSefUrls,$temp);
