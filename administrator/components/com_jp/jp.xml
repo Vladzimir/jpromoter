@@ -220,12 +220,6 @@ CREATE TABLE #__jp_pages (
       <!-- XML CONFIGS 1 item -->
       <filename>sef_configs/jp_com_content.xml</filename>
       <filename>sef_configs/index.html</filename>
-      <!-- XML TRANSLITS 3 item -->
-      <filename>sef_translits/iso-8859-1.ini</filename>
-      <filename>sef_translits/windows-1251.ini</filename>
-      <filename>sef_translits/koi8-r.ini</filename>
-      <filename>sef_translits/utf8.ini</filename>
-      <filename>sef_translits/index.html</filename>
     </files>
     <images>
       <filename>images/preview/no.png</filename>

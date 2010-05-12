@@ -9,21 +9,28 @@
  */
 
 defined('_VALID_MOS') or die();
-$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);//Здесь сделать проверку на использование mod_rewrite и наличие if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
+$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']); //Здесь сделать проверку на использование mod_rewrite и наличие if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 $fst = preg_quote("&gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 $fst = preg_quote("?gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 
-$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp');//isset($temp['options']['encoding']) ? $temp['options']['encoding'] : 'UTF-8';
+$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp'); //isset($temp['options']['encoding']) ? $temp['options']['encoding'] : 'UTF-8';
 //$urlTranslit = JEConfig::get('SEF.jp_url_translit', 'com_jp');
 //define('NO_MOD_REWRITE', '/index.php' );
 
 function urlTranslit($string)
 {
-    $replacedLetters = array(); //Таблица транслитерации
+    $replacedLetters = array('ё' => 'e', 'й' => 'y', 'ц' => 'ts', 'у' => 'u', 'к' =>
+        'k', 'е' => 'e', 'н' => 'n', 'г' => 'g', 'ш' => 'sh', 'щ' => 'shch', 'з' => 'z',
+        'х' => 'kh', 'ъ' => '', 'ф' => 'f', 'ы' => 'y', 'в' => 'v', 'а' => 'a', 'п' =>
+        'p', 'р' => 'r', 'о' => 'o', 'л' => 'l', 'д' => 'd', 'ж' => 'zh', 'э' => 'e',
+        'я' => 'ia', 'ч' => 'ch', 'с' => 's', 'м' => 'm', 'и' => 'i', 'т' => 't', 'ь' =>
+        '', 'б' => 'b', 'ю' => 'iu', 'є' => 'e', 'ї' => 'yi', 'і' => 'i', 'ґ' => 'g'); //Таблица транслитерации
     $string = Jstring::strtolower($string);
-    //$string = Jstring::strtr($string, $replacedLetters);
+//    if ($urlTranslit){
+//    $string = strtr($string, $replacedLetters);
+//    }
     $string = preg_replace('/[^\p{L}\p{Nd}\/0-9]+/u', '-', $string); //http://habrahabr.ru/blogs/php/45910/
     $string = preg_replace('/-\//u', '/', $string);
     $string = preg_replace('/\/-/u', '/', $string);
@@ -278,13 +285,11 @@ function sefRelToAbs($string)
             if ($sharpPos !== false) {
                 $originalURL = Jstring::substr($originalURL, 0, $sharpPos);
             }
-
             $_to_insert = false;
             if (isset($originalAndSefUrls[$originalURL])) {
                 if ($originalAndSefUrls[$originalURL]['sef'] != '') {
-                    return $mosConfig_live_site .
-                    //'/index.php'. 
-                    $originalAndSefUrls[$originalURL]['sef'] . $fragment;
+                    return $mosConfig_live_site . //'/index.php'.
+                        $originalAndSefUrls[$originalURL]['sef'] . $fragment;
                 }
             } else {
                 $_to_insert = true;
@@ -408,9 +413,8 @@ function sefRelToAbs($string)
 
         if (isset($parts['option']) && array_search($parts['option'], $Exclusion)) {
 
-            return $mosConfig_live_site . 
-            //'/index.php'.
-            $originalURL . $fragment;
+            return $mosConfig_live_site . //'/index.php'.
+                $originalURL . $fragment;
         }
 
         $resultUrl = '';
@@ -619,31 +623,33 @@ function sefRelToAbs($string)
         } else {
             $_comp = mosGetParam($_REQUEST, 'option', null);
         }
-        $comp = isset($comp) ? $comp : 'com_frontpage';//Проверка если нет оптион то эту ссылку писать в базу не надо
+        $comp = isset($comp) ? $comp : 'com_frontpage'; //Проверка если нет оптион то эту ссылку писать в базу не надо
 
         static $_insert;
         if (!isset($_insert[$resultUrl])) {
+           if (Jstring::substr($originalURL, 0, 11) == '/index.php?') {
+            $trim_originalURL = substr_replace($originalURL, '', 0, 11);
+            $explode_url = explode('&', $trim_originalURL);
+            sort($explode_url);
+            $implode_url =  implode('&', $explode_url);
+            $optimized_originalURL = '/index.php?'.$implode_url;
+            }else{
+            $optimized_originalURL = $originalURL;    
+            }
+             
             $sql = 'INSERT INTO #__jp_pages (original, sef, component)' . ' VALUES ("' . $database->
-            getEscaped($originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
-            $_comp . '")' . ' ON DUPLICATE KEY UPDATE `sef`="' . $database->getEscaped($resultUrl) .
-            '";';
+                getEscaped($optimized_originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
+                $_comp . '")' . ' ON DUPLICATE KEY UPDATE `sef`="' . $database->getEscaped($resultUrl) .
+                '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
         }
 
-        return $mosConfig_live_site . 
-        //'/index.php'.
-        $resultUrl . $fragment;
+        return $mosConfig_live_site . //'/index.php'.
+            $resultUrl . $fragment;
 
         // JPromoter END -------------------------------------------------------------
 
-        // allows SEF without mod_rewrite
-        // uncomment Line 512 and comment out Line 514
-
-        // uncomment line below if you dont have mod_rewrite
-        // return $mosConfig_live_site .'/index.php/'. $string . $fragment;
-        // If the above doesnt work - try uncommenting this line instead
-        // return $mosConfig_live_site .'/index.php?/'. $string . $fragment;
     } else {
         // Handling for when SEF is not activated
         // Relative link handling
