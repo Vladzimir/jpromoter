@@ -28,9 +28,9 @@ function urlTranslit($string)
         'я' => 'ia', 'ч' => 'ch', 'с' => 's', 'м' => 'm', 'и' => 'i', 'т' => 't', 'ь' =>
         '', 'б' => 'b', 'ю' => 'iu', 'є' => 'e', 'ї' => 'yi', 'і' => 'i', 'ґ' => 'g'); //Таблица транслитерации
     $string = Jstring::strtolower($string);
-//    if ($urlTranslit){
-//    $string = strtr($string, $replacedLetters);
-//    }
+    //    if ($urlTranslit){
+    //    $string = strtr($string, $replacedLetters);
+    //    }
     $string = preg_replace('/[^\p{L}\p{Nd}\/0-9]+/u', '-', $string); //http://habrahabr.ru/blogs/php/45910/
     $string = preg_replace('/-\//u', '/', $string);
     $string = preg_replace('/\/-/u', '/', $string);
@@ -318,84 +318,21 @@ function sefRelToAbs($string)
             //var_dump($parts);
             $sefstring = '';
 
-            // Component com_content urls
-            if (((isset($parts['option']) && ($parts['option'] == 'com_content' || $parts['option'] ==
-                'content'))) && ($parts['task'] != 'new') && ($parts['task'] != 'edit')) {
-                // index.php?option=com_content [&task=$task] [&sectionid=$sectionid] [&id=$id] [&Itemid=$Itemid] [&limit=$limit] [&limitstart=$limitstart] [&year=$year] [&month=$month] [&module=$module]
-                $sefstring .= 'content/';
+            if (isset($parts['option']) && (Jstring::strpos($parts['option'], 'com_') !== false)) {
+                // do not SEF where com_content - `edit` or `new` task link
+                if (!(($parts['option'] == 'com_content') && ((isset($parts['task']) == 'new') ||
+                    (isset($parts['task']) == 'edit')))) {
+                    $sefstring = 'component/';
 
-                // task
-                if (isset($parts['task'])) {
-                    $sefstring .= $parts['task'] . '/';
-                }
-                // sectionid
-                if (isset($parts['sectionid'])) {
-                    $sefstring .= $parts['sectionid'] . '/';
-                }
-                // id
-                if (isset($parts['id'])) {
-                    $sefstring .= $parts['id'] . '/';
-                }
-                // Itemid
-                if (isset($parts['Itemid'])) {
-                    //only add Itemid value if it does not correspond with the 'unassigned' Itemid value
-                    if ($parts['Itemid'] != 99999999 && $parts['Itemid'] != 0) {
-                        $sefstring .= $parts['Itemid'] . '/';
+                    foreach ($parts as $key => $value) {
+                        // remove slashes automatically added by parse_str
+                        $value = stripslashes($value);
+                        $sefstring .= $key . ',' . $value . '/';
                     }
-                }
-                // order
-                if (isset($parts['order'])) {
-                    $sefstring .= 'order,' . $parts['order'] . '/';
-                }
-                // filter
-                if (isset($parts['filter'])) {
-                    $sefstring .= 'filter,' . $parts['filter'] . '/';
-                }
-                // limit
-                if (isset($parts['limit'])) {
-                    $sefstring .= $parts['limit'] . '/';
-                }
-                // limitstart
-                if (isset($parts['limitstart'])) {
-                    $sefstring .= $parts['limitstart'] . '/';
-                }
-                // year
-                if (isset($parts['year'])) {
-                    $sefstring .= $parts['year'] . '/';
-                }
-                // month
-                if (isset($parts['month'])) {
-                    $sefstring .= $parts['month'] . '/';
-                }
-                // module
-                if (isset($parts['module'])) {
-                    $sefstring .= $parts['module'] . '/';
-                }
-                // lang
-                if (isset($parts['lang'])) {
-                    $sefstring .= 'lang,' . $parts['lang'] . '/';
-                }
 
-                $string = $sefstring;
-
-                // all other components
-                // index.php?option=com_xxxx &...
-            } else
-                if (isset($parts['option']) && (Jstring::strpos($parts['option'], 'com_') !== false)) {
-                    // do not SEF where com_content - `edit` or `new` task link
-                    if (!(($parts['option'] == 'com_content') && ((isset($parts['task']) == 'new') ||
-                        (isset($parts['task']) == 'edit')))) {
-                        $sefstring = 'component/';
-
-                        foreach ($parts as $key => $value) {
-                            // remove slashes automatically added by parse_str
-                            $value = stripslashes($value);
-                            $sefstring .= $key . ',' . $value . '/';
-                        }
-
-                        $string = Jstring::str_ireplace('=', ',', $sefstring);
-                    }
+                    $string = Jstring::str_ireplace('=', ',', $sefstring);
                 }
+            }
             // no query given. Empty $string to get only the fragment
             // index.php#anchor or index.php?#anchor
         } else {
@@ -418,196 +355,208 @@ function sefRelToAbs($string)
         }
 
         $resultUrl = '';
+        if (Jstring::substr($originalURL, 0, 11) == '/index.php?') {
+            $trim_originalURL = substr_replace($originalURL, '', 0, 11);
+            $explode_url = explode('&', $trim_originalURL);
+            sort($explode_url);
+            $implode_url = implode('&', $explode_url);
+            $originalURL = '/index.php?' . $implode_url;
+        }
 
         $urlComponents = parse_url($originalURL);
-
+        //echo $urlComponents['query']
         if (!empty($urlComponents['query'])) {
+            if (!isset($originalAndSefUrls[$originalURL])) {
+                global $sefConfigs;
 
-            global $sefConfigs;
+                // ������ imit=' + this.options[selectedIndex].value + '
+                parse_str($urlComponents['query'], $urlQuery);
 
-            // ������ imit=' + this.options[selectedIndex].value + '
-            parse_str($urlComponents['query'], $urlQuery);
+                // ��������, ����� �������������� ���� ������ �� �����, ��� ���������� ��� �������� � �������
+                //        $tempArray = explode('&', $urlComponents['query']);
+                //        foreach ($tempArray as $temp) {
+                //            $tempArray2 = explode('=', $temp);
+                //            $urlQuery[$tempArray2[0]] = $tempArray2[1];
+                //        };
 
-            // ��������, ����� �������������� ���� ������ �� �����, ��� ���������� ��� �������� � �������
-            //        $tempArray = explode('&', $urlComponents['query']);
-            //        foreach ($tempArray as $temp) {
-            //            $tempArray2 = explode('=', $temp);
-            //            $urlQuery[$tempArray2[0]] = $tempArray2[1];
-            //        };
+                if (!empty($urlQuery['option'])) {
 
-            if (!empty($urlQuery['option'])) {
+                    $comp = $urlQuery['option']; // ������������ ����������
 
-                $comp = $urlQuery['option']; // ������������ ����������
+                    if (!isset($sefConfigs[$comp])) {
 
-                if (!isset($sefConfigs[$comp])) {
+                        $absPath = $GLOBALS['mosConfig_absolute_path'];
 
-                    $absPath = $GLOBALS['mosConfig_absolute_path'];
+                        if (file_exists($sefConfigFile = $absPath . '/administrator/components/' . $comp .
+                            '/jp_' . $comp . '.xml') or file_exists($sefConfigFile = $absPath .
+                            '/components/' . $comp . '/jp_' . $comp . '.xml') or file_exists($sefConfigFile =
+                            $absPath . '/administrator/components/com_jp/sef_configs/jp_' . $comp . '.xml')) {
 
-                    if (file_exists($sefConfigFile = $absPath . '/administrator/components/' . $comp .
-                        '/jp_' . $comp . '.xml') or file_exists($sefConfigFile = $absPath .
-                        '/components/' . $comp . '/jp_' . $comp . '.xml') or file_exists($sefConfigFile =
-                        $absPath . '/administrator/components/com_jp/sef_configs/jp_' . $comp . '.xml')) {
+                            require_once ($GLOBALS['mosConfig_absolute_path'] .
+                                '/includes/domit/xml_domit_lite_include.php');
 
-                        require_once ($GLOBALS['mosConfig_absolute_path'] .
-                            '/includes/domit/xml_domit_lite_include.php');
+                            $xmlDoc = new DOMIT_Lite_Document();
+                            $xmlDoc->resolveErrors(true);
 
-                        $xmlDoc = new DOMIT_Lite_Document();
-                        $xmlDoc->resolveErrors(true);
+                            $xmlDoc->parseXML(preg_replace('/<\!\-\-.*\-\-\>/sU', '', $xmlDoc->
+                                getTextFromFile($sefConfigFile)));
 
-                        $xmlDoc->parseXML(preg_replace('/<\!\-\-.*\-\-\>/sU', '', $xmlDoc->
-                            getTextFromFile($sefConfigFile)));
+                            $sefElement = &$xmlDoc->documentElement;
 
-                        $sefElement = &$xmlDoc->documentElement;
+                            if ($sefElement->getAttribute('component') == $comp) {
 
-                        if ($sefElement->getAttribute('component') == $comp) {
+                                $varElements = &$sefElement->getElementsByTagName('var');
 
-                            $varElements = &$sefElement->getElementsByTagName('var');
+                                for ($i = 0; $i < ($varElements->getLength()); $i++) {
 
-                            for ($i = 0; $i < ($varElements->getLength()); $i++) {
+                                    $varElement = &$varElements->item($i);
+                                    $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['type'] = $varElement->
+                                        attributes['type'];
 
-                                $varElement = &$varElements->item($i);
-                                $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['type'] = $varElement->
-                                    attributes['type'];
+                                    if (isset($varElement->attributes['ifpresent'])) {
+                                        $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['ifpresent'] = $varElement->
+                                            attributes['ifpresent'];
+                                    }
 
-                                if (isset($varElement->attributes['ifpresent'])) {
-                                    $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['ifpresent'] = $varElement->
-                                        attributes['ifpresent'];
+                                    if (isset($varElement->attributes['ifabsent'])) {
+                                        $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['ifabsent'] = $varElement->
+                                            attributes['ifabsent'];
+                                    }
+
+                                    switch ($varElement->attributes['type']) {
+                                        case 'query':
+                                            $queryElements = &$varElement->getElementsByTagName('query');
+                                            $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['query'] = $queryElements->
+                                                arNodeList[0]->getText();
+
+                                            $emptyElements = &$varElement->getElementsByTagName('empty');
+                                            $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['empty'] = $emptyElements->
+                                                arNodeList[0]->getText();
+                                            break;
+                                        case 'string':
+                                            $valueElements = &$varElement->getElementsByTagName('value');
+                                            $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['value'] = $valueElements->
+                                                arNodeList[0]->getText();
+                                            break;
+                                    }
+
                                 }
 
-                                if (isset($varElement->attributes['ifabsent'])) {
-                                    $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['ifabsent'] = $varElement->
-                                        attributes['ifabsent'];
+                                $condElements = &$sefElement->getElementsByTagName('cond');
+
+                                for ($i = 0; $i < ($condElements->getLength()); $i++) {
+
+                                    $condElement = &$condElements->item($i);
+                                    $sefConfigs[$comp]['conds'][$i]['arguments'] = $condElement->attributes;
+
+                                    $tplElements = &$condElement->getElementsByTagName('tpl');
+                                    $sefConfigs[$comp]['conds'][$i]['tpl'] = $tplElements->arNodeList[0]->getText();
+
                                 }
+                            }
+                        }
 
-                                switch ($varElement->attributes['type']) {
-                                    case 'query':
-                                        $queryElements = &$varElement->getElementsByTagName('query');
-                                        $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['query'] = $queryElements->
-                                            arNodeList[0]->getText();
+                        if (empty($sefConfigs[$comp])) {
+                            $sefConfigs[$comp]['mode'] = 'bad';
+                        } else {
+                            $sefConfigs[$comp]['mode'] = 'good';
+                        }
+                        ;
 
-                                        $emptyElements = &$varElement->getElementsByTagName('empty');
-                                        $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['empty'] = $emptyElements->
-                                            arNodeList[0]->getText();
-                                        break;
-                                    case 'string':
-                                        $valueElements = &$varElement->getElementsByTagName('value');
-                                        $sefConfigs[$comp]['vars'][$varElement->attributes['name']]['value'] = $valueElements->
-                                            arNodeList[0]->getText();
-                                        break;
-                                }
+                    }
+                    if ($sefConfigs[$comp]['mode'] != 'bad') {
 
+                        $urlArgumentList = $urlQuery;
+
+                        unset($urlArgumentList['option']);
+
+                        $sefConfigs[$comp]['values']['keys'] = array();
+                        $sefConfigs[$comp]['values']['values'] = array();
+
+                        $searchArray = array_keys($urlArgumentList);
+
+                        array_walk($searchArray, create_function('&$v,$k', '$v = \'{\' . $v . \'}\';'));
+
+                        //_xdump($sefConfigs[$comp]['vars']);
+
+                        foreach ($sefConfigs[$comp]['vars'] as $varName => $var) {
+
+                            $val = '';
+
+                            $sefConfigs[$comp]['values']['keys'][] = '{' . $varName . '}';
+
+                            if (isset($var['ifpresent']) and empty($urlArgumentList[$var['ifpresent']])) {
+                                $sefConfigs[$comp]['values']['values'][] = '';
+                                continue;
+                            }
+                            if (isset($var['ifabsent']) and (!empty($urlArgumentList[$var['ifabsent']]))) {
+                                $sefConfigs[$comp]['values']['values'][] = '';
+                                continue;
                             }
 
-                            $condElements = &$sefElement->getElementsByTagName('cond');
+                            switch ($var['type']) {
+                                case 'query':
 
-                            for ($i = 0; $i < ($condElements->getLength()); $i++) {
+                                    $var['query'] = str_ireplace($searchArray, array_values($urlArgumentList), $var['query']);
 
-                                $condElement = &$condElements->item($i);
-                                $sefConfigs[$comp]['conds'][$i]['arguments'] = $condElement->attributes;
+                                    static $_pach;
 
-                                $tplElements = &$condElement->getElementsByTagName('tpl');
-                                $sefConfigs[$comp]['conds'][$i]['tpl'] = $tplElements->arNodeList[0]->getText();
+                                    if (!isset($_pach[$var['query']]) && $var['query'] != '') {
+                                        $database->setQuery($var['query']);
+                                        $_pach[$var['query']] = $database->loadResult();
+                                    }
+                                    ;
+                                    $val = $_pach[$var['query']];
 
+                                    if (empty($val)) {
+                                        $rnd = Jstring::substr(md5(mt_rand(1, 1000)), 0, 16);
+                                        $val = Jstring::str_ireplace('?', $rnd, $var['empty']);
+                                    }
+
+                                    $sefConfigs[$comp]['values']['values'][] = urlTranslit($val);
+
+                                    break;
+                                case 'string':
+
+                                    $sefConfigs[$comp]['values']['values'][] = urlTranslit(str_ireplace($searchArray,
+                                        array_values($urlArgumentList), $var['value']));
+
+                                    break;
                             }
-                        }
-                    }
 
-                    if (empty($sefConfigs[$comp])) {
-                        $sefConfigs[$comp]['mode'] = 'bad';
-                    } else {
-                        $sefConfigs[$comp]['mode'] = 'good';
-                    }
-                    ;
-
-                }
-                if ($sefConfigs[$comp]['mode'] != 'bad') {
-
-                    $urlArgumentList = $urlQuery;
-
-                    unset($urlArgumentList['option']);
-
-                    $sefConfigs[$comp]['values']['keys'] = array();
-                    $sefConfigs[$comp]['values']['values'] = array();
-
-                    $searchArray = array_keys($urlArgumentList);
-
-                    array_walk($searchArray, create_function('&$v,$k', '$v = \'{\' . $v . \'}\';'));
-
-                    //_xdump($sefConfigs[$comp]['vars']);
-
-                    foreach ($sefConfigs[$comp]['vars'] as $varName => $var) {
-
-                        $val = '';
-
-                        $sefConfigs[$comp]['values']['keys'][] = '{' . $varName . '}';
-
-                        if (isset($var['ifpresent']) and empty($urlArgumentList[$var['ifpresent']])) {
-                            $sefConfigs[$comp]['values']['values'][] = '';
-                            continue;
-                        }
-                        if (isset($var['ifabsent']) and (!empty($urlArgumentList[$var['ifabsent']]))) {
-                            $sefConfigs[$comp]['values']['values'][] = '';
-                            continue;
                         }
 
-                        switch ($var['type']) {
-                            case 'query':
+                        foreach ($sefConfigs[$comp]['conds'] as $cond) {
 
-                                $var['query'] = str_ireplace($searchArray, array_values($urlArgumentList), $var['query']);
+                            foreach ($cond['arguments'] as $argumentName => $argumentValue) {
 
-                                static $_pach;
-
-                                if (!isset($_pach[$var['query']]) && $var['query'] != '') {
-                                    $database->setQuery($var['query']);
-                                    $_pach[$var['query']] = $database->loadResult();
+                                if (isset($urlArgumentList[$argumentName])) {
+                                    if ($argumentValue == '*')
+                                        $cond['arguments'][$argumentName] = $urlArgumentList[$argumentName];
+                                    $valueVariants = explode('|', $argumentValue);
+                                    if (in_array($urlArgumentList[$argumentName], $valueVariants))
+                                        $cond['arguments'][$argumentName] = $urlArgumentList[$argumentName];
                                 }
-                                ;
-                                $val = $_pach[$var['query']];
+                            }
 
-                                if (empty($val)) {
-                                    $rnd = Jstring::substr(md5(mt_rand(1, 1000)), 0, 16);
-                                    $val = Jstring::str_ireplace('?', $rnd, $var['empty']);
-                                }
 
-                                $sefConfigs[$comp]['values']['values'][] = urlTranslit($val);
+                            if (array_intersect_assoc($cond['arguments'], $urlArgumentList) == $cond['arguments']) {
+
+                                $resultUrl = str_ireplace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
+                                    $cond['tpl']);
 
                                 break;
-                            case 'string':
 
-                                $sefConfigs[$comp]['values']['values'][] = urlTranslit(str_ireplace($searchArray,
-                                    array_values($urlArgumentList), $var['value']));
-
-                                break;
-                        }
-
-                    }
-
-                    foreach ($sefConfigs[$comp]['conds'] as $cond) {
-
-                        foreach ($cond['arguments'] as $argumentName => $argumentValue) {
-
-                            if (isset($urlArgumentList[$argumentName])) {
-                                if ($argumentValue == '*')
-                                    $cond['arguments'][$argumentName] = $urlArgumentList[$argumentName];
-                                $valueVariants = explode('|', $argumentValue);
-                                if (in_array($urlArgumentList[$argumentName], $valueVariants))
-                                    $cond['arguments'][$argumentName] = $urlArgumentList[$argumentName];
                             }
-                        }
-
-
-                        if (array_intersect_assoc($cond['arguments'], $urlArgumentList) == $cond['arguments']) {
-
-                            $resultUrl = str_ireplace($sefConfigs[$comp]['values']['keys'], $sefConfigs[$comp]['values']['values'],
-                                $cond['tpl']);
-
-                            break;
-
                         }
                     }
                 }
+            } else {
+                $resultUrl = $originalAndSefUrls[$originalURL]['sef'];
+
             }
         }
+
 
         if ($resultUrl == '')
             $resultUrl = '/' . $string;
@@ -626,25 +575,16 @@ function sefRelToAbs($string)
         $comp = isset($comp) ? $comp : 'com_frontpage'; //Проверка если нет оптион то эту ссылку писать в базу не надо
 
         static $_insert;
-        if (!isset($_insert[$resultUrl])) {
-           if (Jstring::substr($originalURL, 0, 11) == '/index.php?') {
-            $trim_originalURL = substr_replace($originalURL, '', 0, 11);
-            $explode_url = explode('&', $trim_originalURL);
-            sort($explode_url);
-            $implode_url =  implode('&', $explode_url);
-            $optimized_originalURL = '/index.php?'.$implode_url;
-            }else{
-            $optimized_originalURL = $originalURL;    
-            }
-             
+
+        if (!isset($_insert[$resultUrl]) and !isset($originalAndSefUrls[$originalURL]) and
+            stripos($resultUrl, 'option,com_') == false) {
             $sql = 'INSERT INTO #__jp_pages (original, sef, component)' . ' VALUES ("' . $database->
-                getEscaped($optimized_originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
+                getEscaped($originalURL) . '", "' . $database->getEscaped($resultUrl) . '","' .
                 $_comp . '")' . ' ON DUPLICATE KEY UPDATE `sef`="' . $database->getEscaped($resultUrl) .
                 '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
         }
-
         return $mosConfig_live_site . //'/index.php'.
             $resultUrl . $fragment;
 
