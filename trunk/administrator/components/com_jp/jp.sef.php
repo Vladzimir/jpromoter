@@ -48,8 +48,89 @@ if ($mosConfig_sef) {
 
     $foundURL = false;
     $Exclusion = array();
-    $database->setQuery('SELECT original, sef FROM #__jp_pages');
-    $originalAndSefUrls = $database->loadAssocList('original');
+    
+    function arraytofile($array, $filename = 0, $file = 0)
+    {
+        $level = 1;
+
+        if ($file == 0) {
+
+            $level = 0;
+
+            $file = fopen($filename, "wb");
+
+            if (!$file) {
+
+                return false;
+
+            }
+
+            fwrite($file, "<" . "?\n\$originalAndSefUrls=");
+
+        }
+
+        $cnt = count($array);
+
+        $i = 0;
+
+        fwrite($file, "array(");
+
+        foreach ($array as $key => $value) {
+
+            if ($i++ != 0) {
+
+                fwrite($file, ",");
+
+            }
+
+            if (is_array($array[$key])) {
+
+                fwrite($file, "'".$key."'=>");
+
+                arraytofile($array[$key], 0, $file);
+
+            } else {
+
+                $value = addcslashes($value, "'" . "\\\\");
+
+                fwrite($file, str_repeat('', ($level + 1) * 2) . "'$key'=>'$value'");
+
+            }
+
+        }
+
+        fwrite($file, ")");
+
+
+        if ($level == 0) {
+
+            fwrite($file, ";\n?" . ">");
+
+            fclose($file);
+
+            return true;
+
+        }
+
+    }
+    if (file_exists($mosConfig_absolute_path . '/cache/jp/sef.php')) {
+        include ($mosConfig_absolute_path . '/cache/jp/sef.php');
+
+    } else {
+        $database->setQuery('SELECT original , sef
+						FROM #__jp_pages');
+
+        $originalAndSefUrls = $database->loadAssocList('original');
+
+        if (!file_exists($mosConfig_absolute_path . '/cache/jp/')) {
+            mkdir($mosConfig_absolute_path . '/cache/jp/', 0777);
+
+        }
+        $temp_file_name = microtime(1);
+        arraytofile($originalAndSefUrls, $mosConfig_absolute_path . '/cache/jp/' . $temp_file_name);
+        rename($mosConfig_absolute_path . '/cache/jp/' . $temp_file_name, $mosConfig_absolute_path .
+            '/cache/jp/sef.php');  
+    }
 
     if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 
@@ -272,7 +353,6 @@ function sefRelToAbs($string)
         }
 
         // JPromoter BEGIN -------------------------------------------------------------
-
         global $originalAndSefUrls;
 
         if ($mosConfig_sef) {
@@ -561,7 +641,7 @@ function sefRelToAbs($string)
         if ($resultUrl == '')
             $resultUrl = '/' . $string;
 
-        $originalAndSefUrls[] = array('original' => $originalURL, 'sef' => $resultUrl);
+//        $originalAndSefUrls[] = array('original' => $originalURL, 'sef' => $resultUrl);
 
         $fst = preg_quote("option=");
         $scd = preg_quote("&");
@@ -584,6 +664,7 @@ function sefRelToAbs($string)
                 '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
+            unlink($mosConfig_absolute_path . '/cache/jp/sef.php');
         }
         return $mosConfig_live_site . //'/index.php'.
             $resultUrl . $fragment;
