@@ -62,19 +62,19 @@ switch ($task) {
     case 'applycnf':
         JEConfig::save($option);
     case 'config':
-
+        /*
         $translitINIPath = $GLOBALS['mosConfig_absolute_path'] .
-            '/administrator/components/com_jp/sef_translits/';
+        '/administrator/components/com_jp/sef_translits/';
 
         $translitINIFiles = array();
 
         foreach (glob($translitINIPath . '*.ini') as $INIFile) {
-            $translitINIFiles[] = substr(basename($INIFile), 0, -4);
+        $translitINIFiles[] = substr(basename($INIFile), 0, -4);
         }
 
         $database->setQuery('UPDATE `#__je_config` SET `values` = "' . implode(',', $translitINIFiles) .
-            '" WHERE `name` = "jp_codepage"');
-        $database->query();
+        '" WHERE `name` = "jp_codepage"');
+        $database->query();*/
 
         mosCommonHTML::loadOverlib();
         JEConfig::renderForm();
@@ -337,6 +337,10 @@ function jpDelete($cid)
 
     $database->setQuery($sql);
     $database->query();
+    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+        unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+
+    }
 }
 
 function jpClear($cid)
@@ -367,6 +371,10 @@ function jpClear($cid)
 
     $database->setQuery($sql);
     $database->query();
+    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+        unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+
+    }
 }
 
 function jpPublish($cid, $task)
@@ -509,7 +517,6 @@ function jpSavePageMeta($cid, $sub = false, $over = false)
     }
 
     $row = $rows[0];
-
     $query = "
         UPDATE #__jp_pages SET 
         newmeta_keywords = '{$new_kw}',   
@@ -532,6 +539,12 @@ function jpSavePageMeta($cid, $sub = false, $over = false)
         echo $database->stderr();
         exit;
     }
+    if ($sef !== $row->sef) {
+        if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+            unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+
+        }
+    }
 
 }
 
@@ -541,6 +554,8 @@ function jpSavePageMeta($cid, $sub = false, $over = false)
 <input type="hidden" name="boxchecked" value="0" />
 <input type="hidden" name="hidemainmenu" value="0" />
 </form>
+<!--
 <div align="center" style="clear:both"><BR>
 <a href="http://joomlaequipment.com" target="_blank">"JPromoter" by <A href="mailto:support@joomlaequipment.com"><b>Joomla Equipment</b></a> &copy;</A>
-</div>  
+</div>
+-->

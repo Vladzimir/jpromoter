@@ -57,7 +57,7 @@ class JEConfig
         if (!$option)
             josRedirect('index2.php', JText::_('Cannot get Component name in JEConfig'));
 
-        $sql = "SELECT name FROM #__je_config WHERE component = '{$option}' AND hidden = 'N'  ORDER BY `section` ASC, fieldset ASC, type  ASC ";
+        $sql = "SELECT name FROM #__je_config WHERE component = '{$option}' ORDER BY `section` ASC, fieldset ASC, type  ASC ";
         $database->setQuery($sql);
         $rows = $database->loadAssocList();
 
@@ -65,7 +65,7 @@ class JEConfig
         $database->setQuery($sql);
         $componentList = $database->loadObjectList();
 
-
+/*
         foreach ($componentList as $component) {
             $find = false;
             foreach ($rows as $row) {
@@ -82,9 +82,9 @@ class JEConfig
                 $database->query();
 
             }
-        }
+        }*/
 
-        $sql = "SELECT * FROM #__je_config WHERE component = '{$option}' AND hidden = 'N'  ORDER BY `section` ASC, fieldset ASC, type  ASC ";
+        $sql = "SELECT * FROM #__je_config WHERE component = '{$option}' ORDER BY `section` ASC, fieldset ASC, type  ASC ";
         $database->setQuery($sql);
         $rows = $database->loadObjectList();
         $com = '';
