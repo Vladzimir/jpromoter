@@ -171,26 +171,5 @@ Then save the file to the root directory of the site and name it .htaccess.
 
 </div>
 ';
-    if (defined('_ISO')) {
-        $iso = explode('=', _ISO);
-        if (!empty($iso[1])) {
-            $iso = $iso[1];
-            $translitINIPath = $GLOBALS['mosConfig_absolute_path'] .
-                '/administrator/components/com_jp/sef_translits/';
-
-            $translitINIFiles = array();
-
-            foreach (glob($translitINIPath . '*.ini') as $INIFile) {
-                $translitINIFiles[] = substr(basename($INIFile), 0, -4);
-            }
-
-            if (in_array($iso, $translitINIFiles)) {
-                $database->setQuery('UPDATE `#__je_config` SET `selected` = "' . $iso .
-                    '" WHERE `name` = "jp_codepage"');
-                $database->query();
-            }
-        }
-    }
-
 }
 ?>

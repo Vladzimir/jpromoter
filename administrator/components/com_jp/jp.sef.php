@@ -9,18 +9,30 @@
  */
 
 defined('_VALID_MOS') or die();
-$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']); //Здесь сделать проверку на использование mod_rewrite и наличие if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
+$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp'); 
+$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']); 
+if ($withoutModrewrite){
+define('NO_MOD_REWRITE', '/index.php' );
+if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) == '/index.php') {
+$_SERVER['REQUEST_URI'] = Jstring::substr($_SERVER['REQUEST_URI'],10,Jstring::strlen($_SERVER['REQUEST_URI']));  
+}
+}else{
+define('NO_MOD_REWRITE', '' );    
+}
 $fst = preg_quote("&gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 $fst = preg_quote("?gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
 
-$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp'); //isset($temp['options']['encoding']) ? $temp['options']['encoding'] : 'UTF-8';
-//$urlTranslit = JEConfig::get('SEF.jp_url_translit', 'com_jp');
-//define('NO_MOD_REWRITE', '/index.php' );
+
+//isset($temp['options']['encoding']) ? $temp['options']['encoding'] : 'UTF-8';
+
+
+//
 
 function urlTranslit($string)
 {
+    $urlTranslit = JEConfig::get('SEF.jp_url_translit', 'com_jp');
     $replacedLetters = array('ё' => 'e', 'й' => 'y', 'ц' => 'ts', 'у' => 'u', 'к' =>
         'k', 'е' => 'e', 'н' => 'n', 'г' => 'g', 'ш' => 'sh', 'щ' => 'shch', 'з' => 'z',
         'х' => 'kh', 'ъ' => '', 'ф' => 'f', 'ы' => 'y', 'в' => 'v', 'а' => 'a', 'п' =>
@@ -28,9 +40,9 @@ function urlTranslit($string)
         'я' => 'ia', 'ч' => 'ch', 'с' => 's', 'м' => 'm', 'и' => 'i', 'т' => 't', 'ь' =>
         '', 'б' => 'b', 'ю' => 'iu', 'є' => 'e', 'ї' => 'yi', 'і' => 'i', 'ґ' => 'g'); //Таблица транслитерации
     $string = Jstring::strtolower($string);
-    //    if ($urlTranslit){
-    //    $string = strtr($string, $replacedLetters);
-    //    }
+    if ($urlTranslit) {
+        $string = strtr($string, $replacedLetters);
+    }
     $string = preg_replace('/[^\p{L}\p{Nd}\/0-9]+/u', '-', $string); //http://habrahabr.ru/blogs/php/45910/
     $string = preg_replace('/-\//u', '/', $string);
     $string = preg_replace('/\/-/u', '/', $string);
@@ -40,7 +52,7 @@ function urlTranslit($string)
 
 // JPromoter END ---------------------------------------------------------------
 
-if ($mosConfig_sef) {
+if (Jconfig::getInstance()->config_sef) {
 
     $_MAMBOTS->trigger('jpBeforeSEF', null);
 
@@ -48,51 +60,30 @@ if ($mosConfig_sef) {
 
     $foundURL = false;
     $Exclusion = array();
-    
+
     function arraytofile($array, $filename = 0, $file = 0)
     {
         $level = 1;
-
         if ($file == 0) {
-
             $level = 0;
-
             $file = fopen($filename, "wb");
-
             if (!$file) {
-
                 return false;
-
             }
-
             fwrite($file, "<" . "?\n\$originalAndSefUrls=");
-
         }
-
         $cnt = count($array);
-
         $i = 0;
-
         fwrite($file, "array(");
-
         foreach ($array as $key => $value) {
-
             if ($i++ != 0) {
-
                 fwrite($file, ",");
-
             }
-
             if (is_array($array[$key])) {
-
-                fwrite($file, "'".$key."'=>");
-
+                fwrite($file, "'" . $key . "'=>");
                 arraytofile($array[$key], 0, $file);
-
             } else {
-
                 $value = addcslashes($value, "'" . "\\\\");
-
                 fwrite($file, str_repeat('', ($level + 1) * 2) . "'$key'=>'$value'");
 
             }
@@ -113,8 +104,8 @@ if ($mosConfig_sef) {
         }
 
     }
-    if (file_exists($mosConfig_absolute_path . '/cache/jp/sef.php')) {
-        include ($mosConfig_absolute_path . '/cache/jp/sef.php');
+    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+        include (Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
     } else {
         $database->setQuery('SELECT original , sef
@@ -122,21 +113,22 @@ if ($mosConfig_sef) {
 
         $originalAndSefUrls = $database->loadAssocList('original');
 
-        if (!file_exists($mosConfig_absolute_path . '/cache/jp/')) {
-            mkdir($mosConfig_absolute_path . '/cache/jp/', 0777);
+        if (!file_exists(Jconfig::getInstance()->config_cachepath . '/jp/')) {
+            mkdir(Jconfig::getInstance()->config_cachepath . '/jp/', 0777);
 
         }
         $temp_file_name = microtime(1);
-        arraytofile($originalAndSefUrls, $mosConfig_absolute_path . '/cache/jp/' . $temp_file_name);
-        rename($mosConfig_absolute_path . '/cache/jp/' . $temp_file_name, $mosConfig_absolute_path .
-            '/cache/jp/sef.php');  
+        arraytofile($originalAndSefUrls, Jconfig::getInstance()->config_cachepath .
+            '/jp/' . $temp_file_name);
+        rename(Jconfig::getInstance()->config_cachepath . '/jp/' . $temp_file_name,
+            Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
     }
 
     if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
 
         $inURL = $_SERVER['REQUEST_URI'];
 
-        $tempPU = parse_url($mosConfig_live_site);
+        $tempPU = parse_url(Jconfig::getInstance()->config_live_site);
         if (!empty($tempPU['path'])) {
             $sitePath = $tempPU['path'];
         } else {
@@ -161,7 +153,7 @@ if ($mosConfig_sef) {
                 // �������� �� �������� 301 ?
 
                 //            header('HTTP/1.1 301 Moved Permanently');
-                //            header('Location: '. $mosConfig_live_site . $orAndSef['original'] . $fragment);
+                //            header('Location: '. Jconfig::getInstance()->config_live_site . $orAndSef['original'] . $fragment);
                 //            die();
 
                 // ��� ���������, ���� ���������� ������ � �����������
@@ -194,7 +186,7 @@ if ($mosConfig_sef) {
 
 // Original SEF ---------------------------------------------------------------
 
-if ($mosConfig_sef and (!$foundURL)) {
+if (Jconfig::getInstance()->config_sef and (!$foundURL)) {
 
 
     $url_array = explode('/', $_SERVER['REQUEST_URI']);
@@ -210,7 +202,7 @@ if ($mosConfig_sef and (!$foundURL)) {
         $QUERY_STRING = '';
 
         // needed for check if component exists
-        $path = $mosConfig_absolute_path . '/components';
+        $path = Jconfig::getInstance()->config_absolute_path . '/components';
         $dirlist = array();
         if (is_dir($path)) {
             $base = opendir($path);
@@ -243,7 +235,8 @@ if ($mosConfig_sef and (!$foundURL)) {
                     // redirect to 404 page if no component found to match url
                     if (!$check) {
                         header('HTTP/1.0 404 Not Found');
-                        require_once ($mosConfig_absolute_path . '/templates/404.php');
+                        require_once (Jconfig::getInstance()->config_absolute_path .
+                            '/templates/404.php');
                         exit(404);
                     }
                 }
@@ -273,9 +266,10 @@ if ($mosConfig_sef and (!$foundURL)) {
             // SSL check - $http_host returns <live site url>:<port number if it is 443>
             $http_host = explode(':', $_SERVER['HTTP_HOST']);
             if ((!empty($_SERVER['HTTPS']) && Jstring::strtolower($_SERVER['HTTPS']) !=
-                'off' || isset($http_host[1]) && $http_host[1] == 443) && Jstring::substr($mosConfig_live_site,
-                0, 8) != 'https://') {
-                $mosConfig_live_site = 'https://' . Jstring::substr($mosConfig_live_site, 7);
+                'off' || isset($http_host[1]) && $http_host[1] == 443) && Jstring::substr(Jconfig::
+                getInstance()->config_live_site, 0, 8) != 'https://') {
+                Jconfig::getInstance()->config_live_site = 'https://' . Jstring::substr(Jconfig::
+                    getInstance()->config_live_site, 7);
             }
         }
 
@@ -292,7 +286,8 @@ if ($mosConfig_sef and (!$foundURL)) {
             !mb_eregi("index2\.php", $_SERVER['REQUEST_URI']) && !mb_eregi("/\?", $_SERVER['REQUEST_URI']) &&
             $_SERVER['QUERY_STRING'] == '') {
             header('HTTP/1.0 404 Not Found');
-            require_once ($mosConfig_absolute_path . '/templates/system/404.php');
+            require_once (Jconfig::getInstance()->config_absolute_path .
+                '/templates/system/404.php');
             exit(404);
         }
     }
@@ -306,7 +301,6 @@ if ($mosConfig_sef and (!$foundURL)) {
  */
 function sefRelToAbs($string)
 {
-    global $mosConfig_live_site, $mosConfig_sef, $mosConfig_multilingual_support;
     global $iso_client_lang, $_MAMBOTS;
 
     if (Jstring::strpos($string, '.value') !== false)
@@ -314,23 +308,26 @@ function sefRelToAbs($string)
 
     $_MAMBOTS->trigger('jpOnURLGenerate', $string);
 
-    if (Jstring::substr($string, 0, Jstring::strlen($mosConfig_live_site)) == $mosConfig_live_site) {
-        $string = Jstring::substr($string, Jstring::strlen($mosConfig_live_site));
+    if (Jstring::substr($string, 0, Jstring::strlen(Jconfig::getInstance()->
+        config_live_site)) == Jconfig::getInstance()->config_live_site) {
+        $string = Jstring::substr($string, Jstring::strlen(Jconfig::getInstance()->
+            config_live_site));
     }
 
     $string = Jstring::ltrim($string, '/');
 
 
     //multilingual code url support
-    if ($mosConfig_sef && $mosConfig_multilingual_support && $string != 'index.php' &&
-        !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(Jstring::substr($string, 0,
-        9), 'index.php') && !mb_eregi('lang=', $string)) {
+    if (Jconfig::getInstance()->config_sef && Jconfig::getInstance()->
+        config_multilingual_support && $string != 'index.php' && !mb_eregi("^(([^:/?#]+):)",
+        $string) && !strcasecmp(Jstring::substr($string, 0, 9), 'index.php') && !
+        mb_eregi('lang=', $string)) {
         $string .= '&amp;lang=' . $iso_client_lang;
     }
 
     // SEF URL Handling
-    if ($mosConfig_sef && !mb_eregi("^(([^:/?#]+):)", $string) && !strcasecmp(Jstring::
-        substr($string, 0, 9), 'index.php')) {
+    if (Jconfig::getInstance()->config_sef && !mb_eregi("^(([^:/?#]+):)", $string) &&
+        !strcasecmp(Jstring::substr($string, 0, 9), 'index.php')) {
         // Replace all &amp; with &
         $string = str_replace('&amp;', '&', $string);
 
@@ -355,7 +352,7 @@ function sefRelToAbs($string)
         // JPromoter BEGIN -------------------------------------------------------------
         global $originalAndSefUrls;
 
-        if ($mosConfig_sef) {
+        if (Jconfig::getInstance()->config_sef) {
 
             $originalURL = '/' . $string;
 
@@ -368,7 +365,7 @@ function sefRelToAbs($string)
             $_to_insert = false;
             if (isset($originalAndSefUrls[$originalURL])) {
                 if ($originalAndSefUrls[$originalURL]['sef'] != '') {
-                    return $mosConfig_live_site . //'/index.php'.
+                    return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
                         $originalAndSefUrls[$originalURL]['sef'] . $fragment;
                 }
             } else {
@@ -422,7 +419,7 @@ function sefRelToAbs($string)
         // allows SEF without mod_rewrite
         // comment line below if you dont have mod_rewrite
 
-        // JPromoter return $mosConfig_live_site .'/'. $string . $fragment;
+        // JPromoter return Jconfig::getInstance()->config_live_site .'/'. $string . $fragment;
 
         // JPromoter BEGIN -------------------------------------------------------------
 
@@ -430,7 +427,7 @@ function sefRelToAbs($string)
 
         if (isset($parts['option']) && array_search($parts['option'], $Exclusion)) {
 
-            return $mosConfig_live_site . //'/index.php'.
+            return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
                 $originalURL . $fragment;
         }
 
@@ -641,7 +638,7 @@ function sefRelToAbs($string)
         if ($resultUrl == '')
             $resultUrl = '/' . $string;
 
-//        $originalAndSefUrls[] = array('original' => $originalURL, 'sef' => $resultUrl);
+        //        $originalAndSefUrls[] = array('original' => $originalURL, 'sef' => $resultUrl);
 
         $fst = preg_quote("option=");
         $scd = preg_quote("&");
@@ -664,9 +661,13 @@ function sefRelToAbs($string)
                 '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
-            unlink($mosConfig_absolute_path . '/cache/jp/sef.php');
+            if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+                unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+
+            }
+
         }
-        return $mosConfig_live_site . //'/index.php'.
+        return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
             $resultUrl . $fragment;
 
         // JPromoter END -------------------------------------------------------------
@@ -674,12 +675,13 @@ function sefRelToAbs($string)
     } else {
         // Handling for when SEF is not activated
         // Relative link handling
-        if ((Jstring::strpos($string, $mosConfig_live_site) !== 0)) {
+        if ((Jstring::strpos($string, Jconfig::getInstance()->config_live_site) !== 0)) {
             // if URI starts with a "/", means URL is at the root of the host...
             if (strncmp($string, '/', 1) == 0) {
                 // splits http(s)://xx.xx/yy/zz..." into [1]="http(s)://xx.xx" and [2]="/yy/zz...":
                 $live_site_parts = array();
-                mb_eregi("^(https?:[\/]+[^\/]+)(.*$)", $mosConfig_live_site, $live_site_parts);
+                mb_eregi("^(https?:[\/]+[^\/]+)(.*$)", Jconfig::getInstance()->config_live_site,
+                    $live_site_parts);
 
                 $string = $live_site_parts[1] . $string;
             } else {
@@ -697,7 +699,7 @@ function sefRelToAbs($string)
                 }
 
                 if ($check) {
-                    $string = $mosConfig_live_site . '/' . $string;
+                    $string = Jconfig::getInstance()->config_live_site . '/' . $string;
                 }
             }
         }
