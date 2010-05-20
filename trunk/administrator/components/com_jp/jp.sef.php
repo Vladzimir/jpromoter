@@ -9,15 +9,16 @@
  */
 
 defined('_VALID_MOS') or die();
-$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp'); 
-$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']); 
-if ($withoutModrewrite){
-define('NO_MOD_REWRITE', '/index.php' );
-if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) == '/index.php') {
-$_SERVER['REQUEST_URI'] = Jstring::substr($_SERVER['REQUEST_URI'],10,Jstring::strlen($_SERVER['REQUEST_URI']));  
-}
-}else{
-define('NO_MOD_REWRITE', '' );    
+$withoutModrewrite = JEConfig::get('SEF.jp_mod_rewrite', 'com_jp');
+$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);
+if ($withoutModrewrite) {
+    define('NO_MOD_REWRITE', '/index.php');
+    if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) == '/index.php') {
+        $_SERVER['REQUEST_URI'] = Jstring::substr($_SERVER['REQUEST_URI'], 10, Jstring::
+            strlen($_SERVER['REQUEST_URI']));
+    }
+} else {
+    define('NO_MOD_REWRITE', '');
 }
 $fst = preg_quote("&gclid=");
 $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_URI']);
@@ -104,24 +105,31 @@ if (Jconfig::getInstance()->config_sef) {
         }
 
     }
-    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
-        include (Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+    if (JEConfig::get('SEF.jp_cache', 'com_jp')) {
+        if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+            include (Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
+        } else {
+            $database->setQuery('SELECT original , sef
+						FROM #__jp_pages');
+
+            $originalAndSefUrls = $database->loadAssocList('original');
+
+            if (!file_exists(Jconfig::getInstance()->config_cachepath . '/jp/')) {
+                mkdir(Jconfig::getInstance()->config_cachepath . '/jp/', 0777);
+
+            }
+            $temp_file_name = microtime(1);
+            arraytofile($originalAndSefUrls, Jconfig::getInstance()->config_cachepath .
+                '/jp/' . $temp_file_name);
+            rename(Jconfig::getInstance()->config_cachepath . '/jp/' . $temp_file_name,
+                Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+        }
     } else {
         $database->setQuery('SELECT original , sef
 						FROM #__jp_pages');
 
         $originalAndSefUrls = $database->loadAssocList('original');
-
-        if (!file_exists(Jconfig::getInstance()->config_cachepath . '/jp/')) {
-            mkdir(Jconfig::getInstance()->config_cachepath . '/jp/', 0777);
-
-        }
-        $temp_file_name = microtime(1);
-        arraytofile($originalAndSefUrls, Jconfig::getInstance()->config_cachepath .
-            '/jp/' . $temp_file_name);
-        rename(Jconfig::getInstance()->config_cachepath . '/jp/' . $temp_file_name,
-            Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
     }
 
     if (Jstring::substr($_SERVER['REQUEST_URI'], 0, 10) != '/index.php') {
@@ -365,8 +373,8 @@ function sefRelToAbs($string)
             $_to_insert = false;
             if (isset($originalAndSefUrls[$originalURL])) {
                 if ($originalAndSefUrls[$originalURL]['sef'] != '') {
-                    return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
-                        $originalAndSefUrls[$originalURL]['sef'] . $fragment;
+                    return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE . $originalAndSefUrls[$originalURL]['sef'] .
+                        $fragment;
                 }
             } else {
                 $_to_insert = true;
@@ -427,8 +435,8 @@ function sefRelToAbs($string)
 
         if (isset($parts['option']) && array_search($parts['option'], $Exclusion)) {
 
-            return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
-                $originalURL . $fragment;
+            return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE . $originalURL .
+                $fragment;
         }
 
         $resultUrl = '';
@@ -661,14 +669,16 @@ function sefRelToAbs($string)
                 '";';
             $database->setQuery($sql);
             $_insert[$resultUrl] = $database->query();
-            if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
-                unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+            if (JEConfig::get('SEF.jp_cache', 'com_jp')) {
+                if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+                    unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
+                }
             }
 
         }
-        return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE .
-            $resultUrl . $fragment;
+        return Jconfig::getInstance()->config_live_site . NO_MOD_REWRITE . $resultUrl .
+            $fragment;
 
         // JPromoter END -------------------------------------------------------------
 

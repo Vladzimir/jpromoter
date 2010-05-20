@@ -337,9 +337,11 @@ function jpDelete($cid)
 
     $database->setQuery($sql);
     $database->query();
-    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
-        unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+    if (JEConfig::get('SEF.jp_cache', 'com_jp')) {
+        if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+            unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
+        }
     }
 }
 
@@ -371,9 +373,11 @@ function jpClear($cid)
 
     $database->setQuery($sql);
     $database->query();
-    if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
-        unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+    if (JEConfig::get('SEF.jp_cache', 'com_jp')) {
+        if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+            unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
+        }
     }
 }
 
@@ -539,10 +543,12 @@ function jpSavePageMeta($cid, $sub = false, $over = false)
         echo $database->stderr();
         exit;
     }
-    if ($sef !== $row->sef) {
-        if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
-            unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
+    if (JEConfig::get('SEF.jp_cache', 'com_jp')) {
+        if ($sef !== $row->sef) {
+            if (file_exists(Jconfig::getInstance()->config_cachepath . '/jp/sef.php')) {
+                unlink(Jconfig::getInstance()->config_cachepath . '/jp/sef.php');
 
+            }
         }
     }
 
