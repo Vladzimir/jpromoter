@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sefconfig component="com_content">
 	<!-- 3:57 PM 2008-04-10 -->
+<!-- Для первой страницы -->		
+		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" limit="*" limitstart="0" Itemid="*">
+			<tpl>{language}/{table}{menuitem}.html</tpl>
+		</cond>
 		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" limit="*" limitstart="*" Itemid="*">
 			<tpl>{language}/{table}{menuitem}/page-{pagenumber}.html</tpl>
 		</cond>
 		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" Itemid="*">
 			<tpl>{language}/{table}{menuitem}.html</tpl>
+		</cond>
+<!-- Для первой страницы -->
+		<cond task="category|blogcategory|archivecategory" id="*" limit="*" limitstart="0">
+			<tpl>{language}/{table}{category}.html</tpl>
 		</cond>
 		<cond task="category|blogcategory|archivecategory" id="*" limit="*" limitstart="*">
 			<tpl>{language}/{table}{category}/page-{pagenumber}.html</tpl>
@@ -13,11 +21,19 @@
 		<cond task="category|blogcategory|archivecategory" id="*">
 			<tpl>{language}/{table}{category}.html</tpl>
 		</cond>
+<!-- Для первой страницы -->
+		 <cond task="section|blogsection|archivesection" id="*" limit="*" limitstart="0">
+			 <tpl>{language}/{table}{section}.html</tpl>
+		 </cond>
 		<cond task="section|blogsection|archivesection" id="*" limit="*" limitstart="*">
 			<tpl>{language}/{table}{section}/page-{pagenumber}.html</tpl>
 		</cond>
 		<cond task="section|blogsection|archivesection" id="*">
 			<tpl>{language}/{table}{section}.html</tpl>
+		</cond>
+<!-- Для первой страницы -->
+		<cond task="view" id="*" limit="*" limitstart="0">
+			<tpl>{language}/{content}.html</tpl>
 		</cond>
 		<cond task="view" id="*" limit="*" limitstart="*">
 			<tpl>{language}/{content}/page-{pagenumber}.html</tpl>
@@ -62,5 +78,14 @@
 		<var name="language" type="string" ifpresent="lang">
 			<value>/{lang}</value>
 		</var>
-
+		<var name="pagenumber" type="query">
+	   		<query>SELECT ({limitstart} div {limit}) + 1</query>
+		   <empty>?</empty>
+		</var>
+		<var name="limitstart" type="string">
+			<value>{limitstart}</value>
+		</var>
+		<var name="limit" type="string">
+			<value>{limit}</value>
+		</var>
 </sefconfig>
