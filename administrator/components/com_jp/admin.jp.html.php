@@ -49,17 +49,16 @@ function jpControlPanel()
 
     $link = 'index2.php?option=com_jp&amp;task=optimize';
     jpQuickIcon($link, '/administrator/components/com_jp/images/searchtext.png',
-        JText::_('SEF URLs'));
+        JP_SEF_URLS2 );
 
     $link = 'index2.php?option=com_jp&amp;task=scan';
-    jpQuickIcon($link, '/administrator/images/searchtext.png', JText::_('SE Simulation'));
+    jpQuickIcon($link, '/administrator/images/searchtext.png', JP_SE_SIMULATION );
 
     $link = 'index2.php?option=com_jp&amp;task=google';
-    jpQuickIcon($link, '/administrator/components/com_jp/images/google.png', JText::
-        _('SEO Tools'));
+    jpQuickIcon($link, '/administrator/components/com_jp/images/google.png', JP_SEO_TOOLS);
 
     $link = 'index2.php?option=com_jp&amp;task=config';
-    jpQuickIcon($link, '/administrator/images/config.png', JText::_('Configuration'));
+    jpQuickIcon($link, '/administrator/images/config.png', JP_CONFIGURATION );
 
 ?>
             </div>
@@ -333,13 +332,13 @@ Depending on server setup and number of site pages, operation of SE simulation m
     </td>
 	<td>
 <select name="indcount" id="countind" style="width: 100px;">
-	<option value="5">5 страниц</option>
-	<option value="10" SELECTED>10 страниц</option>
-	<option value="15">15 страниц</option>
-	<option value="20">20 страниц</option>
-	<option value="30">30 страниц</option>
-	<option value="50">50 страниц</option>
-	<option value="100">100 страниц</option>
+	<option value="5"><?php echo JP_5_STR ; ?></option>
+	<option value="10" SELECTED><?php echo JP_10_STR ; ?></option>
+	<option value="15"><?php echo JP_15_STR ; ?></option>
+	<option value="20"><?php echo JP_20_STR ; ?></option>
+	<option value="30"><?php echo JP_30_STR ; ?></option>
+	<option value="50"><?php echo JP_50_STR ; ?></option>
+	<option value="100"><?php echo JP_100_STR ; ?></option>
 </select>
 	</td>
 </tr>
@@ -415,18 +414,18 @@ function jxListPagesHtml()
         <TR>
           <TD align="left">
           <?php
-    echo '<input type="checkbox" name="doAllComponent" value="1" onclick="document.adminForm.toggle.checked=this.checked;checkAll(100)"/> Apply to all filtered pages';
+    echo '<input type="checkbox" name="doAllComponent" value="1" onclick="document.adminForm.toggle.checked=this.checked;checkAll(100)"/> ' , JP_APPLY_TO_ALL_FILTERED_PAGES ;
 ?>
           </TD>
-          <TD align="right"> Search parameter:
+          <TD align="right"> <?php echo JP_SEARCH_PARAMETER ; ?>
           
           <?php
 
-    $searchCond[] = mosHTML::makeOption('all', JText::_('All'), 'vn', 'tn');
-    $searchCond[] = mosHTML::makeOption('original', JText::_('URL'), 'vn', 'tn');
-    $searchCond[] = mosHTML::makeOption('sef', JText::_('SEF URL'), 'vn', 'tn');
-    $searchCond[] = mosHTML::makeOption('title', JText::_('Title'), 'vn', 'tn');
-    $searchCond[] = mosHTML::makeOption('new_title', JText::_('New Title'), 'vn',
+    $searchCond[] = mosHTML::makeOption('all', JP_SEARCH_PARAMETER_ALL, 'vn', 'tn');
+    $searchCond[] = mosHTML::makeOption('original', JP_SEARCH_PARAMETER_URL, 'vn', 'tn');
+    $searchCond[] = mosHTML::makeOption('sef', JP_SEARCH_PARAMETER_SEF_URL, 'vn', 'tn');
+    $searchCond[] = mosHTML::makeOption('title', JP_SEARCH_PARAMETER_TITLE, 'vn', 'tn');
+    $searchCond[] = mosHTML::makeOption('new_title', JP_SEARCH_PARAMETER_NEW_TITLE, 'vn',
         'tn');
 
     echo mosHTML::selectList($searchCond, 'search_cond', 'class="inputbox" size="1"',
@@ -434,9 +433,9 @@ function jxListPagesHtml()
 
 ?>
 
-          &nbsp;&nbsp;Search text: <INPUT type="text" name="q" value="<?php echo
+          &nbsp;&nbsp;<?php echo JP_SEARCH_TEXT ;?> <INPUT type="text" name="q" value="<?php echo
 mosGetParam($_REQUEST, 'q') ?>" />
-          <INPUT type="button" class="button" value="Search" onclick="javascript:submitbutton('optimize')" />
+          <INPUT type="button" class="button" value="<?php echo JP_KNOPKA_SEARCH ;?>" onclick="javascript:submitbutton('optimize')" />
           </TD>
         </TR>
       </table>
@@ -445,19 +444,19 @@ mosGetParam($_REQUEST, 'q') ?>" />
             <td>
                 <input type="checkbox" name="showhide" value="1"  onclick="javascript:submitform('optimize')" <?php if (mosGetParam
 ($_REQUEST, 'showhide', false))
-        echo " CHECKED=CHECKED "; ?>/>Show only hidden
+        echo " CHECKED=CHECKED "; ?>/><?php echo JP_SHOW_ONLY_HIDDEN ; ?>
                 
             </td>
-            <td align="right">Filters:
+            <td align="right"><?php echo JP_FILTERS ;?>
                 <?php
     $sql = "SELECT component FROM `#__jp_pages` group by component";
     $database->setQuery($sql);
     $rows = $database->loadObjectList();
-    $cmp[] = mosHTML::makeOption(null, JText::_('- Select Component -'), 'i',
+    $cmp[] = mosHTML::makeOption(null, JP_SELECT_COMPONENT, 'i',
         'index');
     if (count($rows) > 0) {
         foreach ($rows as $row) {
-            $cmp[] = mosHTML::makeOption($row->component, JText::_('Component') . ' ' . $row->
+            $cmp[] = mosHTML::makeOption($row->component, JP_COMPONENT . ' ' . $row->
                 component, 'i', 'index');
         }
     }
@@ -465,40 +464,40 @@ mosGetParam($_REQUEST, 'q') ?>" />
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 'i',
         'index', mosGetParam($_REQUEST, 'component'));
 
-    $indexed[] = mosHTML::makeOption('', JText::_('- Select Indexed -'), 'in',
+    $indexed[] = mosHTML::makeOption('', JP_SELECT_INDEXED, 'in',
         'indexed');
-    $indexed[] = mosHTML::makeOption('yes', JText::_('Yes'), 'in', 'indexed');
-    $indexed[] = mosHTML::makeOption('no', JText::_('No'), 'in', 'indexed');
+    $indexed[] = mosHTML::makeOption('yes', JP_SELECT_INDEXED_YES, 'in', 'indexed');
+    $indexed[] = mosHTML::makeOption('no', JP_SELECT_INDEXED_NO, 'in', 'indexed');
     echo mosHTML::selectList($indexed, 'indexed',
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 'in',
         'indexed', mosGetParam($_REQUEST, 'indexed'));
 
-    $indx[] = mosHTML::makeOption('', JText::_('- Select Index -'), 'i', 'index');
-    $indx[] = mosHTML::makeOption('index', JText::_('Index'), 'i', 'index');
-    $indx[] = mosHTML::makeOption('noindex', JText::_('No Index'), 'i', 'index');
+    $indx[] = mosHTML::makeOption('', JP_SELECT_INDEX, 'i', 'index');
+    $indx[] = mosHTML::makeOption('index', JP_INDEX, 'i', 'index');
+    $indx[] = mosHTML::makeOption('noindex', JP_NO_INDEX, 'i', 'index');
     echo mosHTML::selectList($indx, 'index',
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 'i',
         'index', mosGetParam($_REQUEST, 'index'));
 
-    $flw[] = mosHTML::makeOption('', JText::_('- Select Follow -'), 'f', 'follow');
-    $flw[] = mosHTML::makeOption('follow', JText::_('Follow'), 'f', 'follow');
-    $flw[] = mosHTML::makeOption('nofollow', JText::_('No Follow'), 'f', 'follow');
+    $flw[] = mosHTML::makeOption('', JP_SELECT_FOLLOW, 'f', 'follow');
+    $flw[] = mosHTML::makeOption('follow', JP_FOLLOW, 'f', 'follow');
+    $flw[] = mosHTML::makeOption('nofollow', JP_NO_FOLLOW, 'f', 'follow');
     echo mosHTML::selectList($flw, 'follow',
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 'f',
         'follow', mosGetParam($_REQUEST, 'follow'));
 
-    $publ[] = mosHTML::makeOption('', JText::_('- Select Published -'), 'p',
+    $publ[] = mosHTML::makeOption('', JP_SELECT_PUBLISHED, 'p',
         'publish');
-    $publ[] = mosHTML::makeOption('Y', JText::_('Published'), 'p', 'publish');
-    $publ[] = mosHTML::makeOption('N', JText::_('Unpudlished'), 'p', 'publish');
+    $publ[] = mosHTML::makeOption('Y', JP_PUBLISHED, 'p', 'publish');
+    $publ[] = mosHTML::makeOption('N', JP_UNPUBLISHED, 'p', 'publish');
     echo mosHTML::selectList($publ, 'publish',
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 'p',
         'publish', mosGetParam($_REQUEST, 'publish'));
 
-    $stat[] = mosHTML::makeOption('', JText::_('- Select Status -'), 's', 'status');
-    $stat[] = mosHTML::makeOption('g', JText::_('Green status'), 's', 'status');
-    $stat[] = mosHTML::makeOption('y', JText::_('Yellow status'), 's', 'status');
-    $stat[] = mosHTML::makeOption('r', JText::_('Red status'), 's', 'status');
+    $stat[] = mosHTML::makeOption('', JP_SELECT_STATUS, 's', 'status');
+    $stat[] = mosHTML::makeOption('g', JP_GREEN_STATUS, 's', 'status');
+    $stat[] = mosHTML::makeOption('y', JP_YELLOW_STATUS, 's', 'status');
+    $stat[] = mosHTML::makeOption('r', JP_RED_STATUS, 's', 'status');
     echo mosHTML::selectList($stat, 'status',
         'class="inputbox" size="1" onChange="javascript:submitform(\'optimize\')"', 's',
         'status', mosGetParam($_REQUEST, 'status'));
@@ -522,23 +521,23 @@ mosGetParam($_REQUEST, 'q') ?>" />
         <TH width="1%">
         <input type="checkbox" name="toggle" value=""  onclick="checkAll(100);" />
         </TH>
-        <TH style="width: 1%;"><?php echo JText::_('Cmp'); ?></TH>
-        <TH><?php echo JText::_('Page'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Sitemap'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Indexed'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Code'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Gr/Ar'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('CurrMeta'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('NewMeta'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Index'); ?></TH>
-        <TH style="width: 1%;"><?php echo JText::_('Follow'); ?></TH>        
-        <TH style="width: 1%;"><?php echo JText::_('Publish'); ?></TH>
+        <TH style="width: 1%;"><?php echo JP_CMP; ?></TH>
+        <TH><?php echo JP_PAGE; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_SITEMAP; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_INDEXED; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_CODE; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_GR_AR; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_CURRMETA; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_NEWMETA; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_INDEX; ?></TH>
+        <TH style="width: 1%;"><?php echo JP_FOLLOW; ?></TH>        
+        <TH style="width: 1%;"><?php echo JP_PUBLISH; ?></TH>
         <!--
         <TH><?php echo JText::_('Meta Title'); ?></TH>
         <TH><?php echo JText::_('Meta Keywords'); ?></TH>
         <TH><?php echo JText::_('Meta Description'); ?></TH>
         -->
-        <TH style="width: 1%;"><?php echo JText::_('Status'); ?></TH>
+        <TH style="width: 1%;"><?php echo JP_STATUS; ?></TH>
        </TR>
       <?php
 

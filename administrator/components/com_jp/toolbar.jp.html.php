@@ -16,16 +16,16 @@ class jpToolBar
         mosMenuBar::startTable();
         mosMenuBar::spacer();
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
 
         mosMenuBar::custom('gsm', '../../../components/com_jp/images/sitemap.gif',
-            '../../../components/com_jp/images/sitemap.gif', JText::_('Site map'), false, false);
+            '../../../components/com_jp/images/sitemap.gif', JP_TOP_SITE_MAP, false, false);
         mosMenuBar::spacer();
         mosMenuBar::custom('updateXML', '../../../components/com_jp/images/sitemap.gif',
-            '../../../components/com_jp/images/refresh.gif', JText::_('Integration'), false, false);
+            '../../../components/com_jp/images/refresh.gif', JP_TOP_INTEGRATION, false, false);
         mosMenuBar::spacer();
         //mosMenuBar::custom('ginfo',  '../../../components/com_jp/images/refresh.gif', '../../../components/com_jp/images/refresh.gif', JText::_('Refresh'), false, false );
         //mosMenuBar::spacer();
@@ -40,14 +40,14 @@ class jpToolBar
         //mosMenuBar::title( JText::_( 'SE Simulation'), 'searchtext.png' );
         mosMenuBar::spacer();
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
         //            mosMenuBar::custom('doindex', 'apply_f2.png','apply_f2.png', JText::_('Simulate'), false, false );
-        mosMenuBar::custom('newsimulate', 'new.png', 'new_f2.png', JText::_('New'), false, false);
+        mosMenuBar::custom('newsimulate', 'new.png', 'new_f2.png', JP_TOP_NEW, false, false);
         mosMenuBar::spacer();
-        mosMenuBar::deleteList('Delete', 'removesimulation', 'Delete');
+        mosMenuBar::deleteList('Delete', 'removesimulation', JP_TOP_DELETE);
         //            mosMenuBar::custom('removesimulation', 'delete.png','delete_f2.png', JText::_('Delete'), true, true );
         mosMenuBar::spacer();
         mosMenuBar::divider();
@@ -62,7 +62,7 @@ class jpToolBar
         //mosMenuBar::title( JText::_( 'JPromoter [Edit Page]'), '../components/com_jp/images/logo.png' );
         mosMenuBar::spacer();
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
@@ -87,12 +87,12 @@ class jpToolBar
 
         mosMenuBar::custom('hidepagesitemap',
             '../../../components/com_jp/images/hide.gif',
-            '../../../components/com_jp/images/hide.gif', JText::_('Hide/Unhide sitemap'), true, false);
+            '../../../components/com_jp/images/hide.gif', JP_TOP_HU, true, false);
         mosMenuBar::spacer();
 
         //mosMenuBar::title( JText::_( 'JPromoter'), '../components/com_jp/images/logo.png' );
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
@@ -100,7 +100,7 @@ class jpToolBar
         //mosMenuBar::custom('pagerank',  '../../../components/com_jp/images/pagerank.gif', '../../../components/com_jp/images/pagerank.gif', JText::_('ReRank'), true, false );
         //mosMenuBar::spacer();
         mosMenuBar::custom('hidepage', '../../../components/com_jp/images/hide.gif',
-            '../../../components/com_jp/images/hide.gif', JText::_('Hide/Unhide'), true, false);
+            '../../../components/com_jp/images/hide.gif', JP_TOP_HU2, true, false);
         mosMenuBar::spacer();
 
         mosMenuBar::publish();
@@ -110,27 +110,27 @@ class jpToolBar
         mosMenuBar::spacer();
 
         mosMenuBar::custom('index', '../../../components/com_jp/images/index.gif',
-            '../../../components/com_jp/images/index.gif', JText::_('Index'), true, false);
+            '../../../components/com_jp/images/index.gif', JP_TOP_INDEX, true, false);
         mosMenuBar::spacer();
         mosMenuBar::custom('noindex', '../../../components/com_jp/images/noindex.gif',
-            '../../../components/com_jp/images/noindex.gif', JText::_('No Index'), true, false);
+            '../../../components/com_jp/images/noindex.gif', JP_TOP_NO_INDEX, true, false);
         mosMenuBar::spacer();
 
         mosMenuBar::custom('follow', '../../../components/com_jp/images/follow.gif',
-            '../../../components/com_jp/images/follow.gif', JText::_('Follow'), true, false);
+            '../../../components/com_jp/images/follow.gif', JP_TOP_FOLLOW, true, false);
         mosMenuBar::spacer();
         mosMenuBar::custom('nofollow', '../../../components/com_jp/images/nofollow.gif',
-            '../../../components/com_jp/images/nofollow.gif', JText::_('No Follow'), true, false);
+            '../../../components/com_jp/images/nofollow.gif', JP_TOP_NO_FOLLOW, true, false);
         mosMenuBar::spacer();
 
         //        mosMenuBar::editList('editpage');
         //        mosMenuBar::spacer();
 
         mosMenuBar::custom('getrank', '../../../components/com_jp/images/pagerank.gif',
-            '../../../components/com_jp/images/pagerank.gif', JText::_('Get Ranks'), true, false);
+            '../../../components/com_jp/images/pagerank.gif', JP_TOP_GET_RANKS, true, false);
         mosMenuBar::spacer();
 
-        mosMenuBar::custom('clear', 'delete_f2.png', 'delete_f2.png', JText::_('Clear SEF'), true, false);
+        mosMenuBar::custom('clear', 'delete_f2.png', 'delete_f2.png', JP_TOP_CLEAR_SEF, true, false);
         mosMenuBar::spacer();
 
         mosMenuBar::deleteList('delete');

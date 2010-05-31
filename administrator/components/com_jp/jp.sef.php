@@ -34,12 +34,12 @@ $_SERVER['REQUEST_URI'] = preg_replace("#$fst*(.*?).*#", '', $_SERVER['REQUEST_U
 function urlTranslit($string)
 {
     $urlTranslit = JEConfig::get('SEF.jp_url_translit', 'com_jp');
-    $replacedLetters = array('ё' => 'e', 'й' => 'y', 'ц' => 'ts', 'у' => 'u', 'к' =>
-        'k', 'е' => 'e', 'н' => 'n', 'г' => 'g', 'ш' => 'sh', 'щ' => 'shch', 'з' => 'z',
-        'х' => 'kh', 'ъ' => '', 'ф' => 'f', 'ы' => 'y', 'в' => 'v', 'а' => 'a', 'п' =>
+    $replacedLetters = array('ё' => 'e', 'й' => 'y', 'ц' => 'c', 'у' => 'u', 'к' =>
+        'k', 'е' => 'e', 'н' => 'n', 'г' => 'g', 'ш' => 'sh', 'щ' => 'sch', 'з' => 'z',
+        'х' => 'h', 'ъ' => '', 'ф' => 'f', 'ы' => 'y', 'в' => 'v', 'а' => 'a', 'п' =>
         'p', 'р' => 'r', 'о' => 'o', 'л' => 'l', 'д' => 'd', 'ж' => 'zh', 'э' => 'e',
-        'я' => 'ia', 'ч' => 'ch', 'с' => 's', 'м' => 'm', 'и' => 'i', 'т' => 't', 'ь' =>
-        '', 'б' => 'b', 'ю' => 'iu', 'є' => 'e', 'ї' => 'yi', 'і' => 'i', 'ґ' => 'g'); //Таблица транслитерации
+        'я' => 'ya', 'ч' => 'ch', 'с' => 's', 'м' => 'm', 'и' => 'i', 'т' => 't', 'ь' =>
+        '', 'б' => 'b', 'ю' => 'yu', 'є' => 'e', 'ї' => 'yi', 'і' => 'i', 'ґ' => 'g'); //Таблица транслитерации
     $string = Jstring::strtolower($string);
     if ($urlTranslit) {
         $string = strtr($string, $replacedLetters);
