@@ -52,13 +52,13 @@ function jpControlPanel()
         JP_SEF_URLS2 );
 
     $link = 'index2.php?option=com_jp&amp;task=scan';
-    jpQuickIcon($link, '/administrator/images/searchtext.png', JP_SE_SIMULATION );
+    jpQuickIcon($link, '/administrator/components/com_jp/images/simulation.png', JP_SE_SIMULATION );
 
     $link = 'index2.php?option=com_jp&amp;task=google';
     jpQuickIcon($link, '/administrator/components/com_jp/images/google.png', JP_SEO_TOOLS);
 
     $link = 'index2.php?option=com_jp&amp;task=config';
-    jpQuickIcon($link, '/administrator/images/config.png', JP_CONFIGURATION );
+    jpQuickIcon($link, '/administrator/components/com_jp/images/configa.png', JP_CONFIGURATION );
 
 ?>
             </div>
