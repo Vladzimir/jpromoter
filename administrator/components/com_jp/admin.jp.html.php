@@ -37,7 +37,7 @@ function jpControlPanel()
 		<table class="adminheading">
 		<tr>
 			<th class="cpanel">
-			JPromoter Control Panel
+			<?php echo JP_CONTROL_PANEL ; ?>
 			</th>
 		</tr>
 		</table>
@@ -71,15 +71,15 @@ function jpControlPanel()
 <?php
     $tabs = new mosTabs(1);
     $tabs->startPane("configPane");
-    $tabs->startTab(JText::_('Summary'), "summaty-page");
+    $tabs->startTab(JP_SUMMARY, "summaty-page");
 ?>
 <table class="adminform">
   <tr>
-    <th colspan="2"><?php echo JText::_('Counts'); ?></th>
+    <th colspan="2"><?php echo JP_COUNTS ; ?></th>
   </tr>
   
   <tr class="row1">
-    <td width="200px"><?php echo JText::_('Simulate links'); ?></td>
+    <td width="200px"><?php echo JP_SIMULATE_LINKS ; ?></td>
     <td>
     <?php
     global $database;
@@ -92,7 +92,7 @@ function jpControlPanel()
   </tr>
   
   <tr class="row0">
-    <td><B style="color: #0033cc;"><?php echo JText::_('SEF URLs'); ?></B></td>
+    <td><B style="color: #0033cc;"><?php echo JP_SEF_URLS ; ?></B></td>
     <td>
     <?php
     global $database;
@@ -105,7 +105,7 @@ function jpControlPanel()
   </tr>
 
   <tr class="row1">
-    <td><?php echo JText::_('Optimized Pages'); ?></td>
+    <td><?php echo JP_OPTIMIZED_PAGES ; ?></td>
     <td>
     <?php
     global $database;
@@ -118,7 +118,7 @@ function jpControlPanel()
   </tr>
 
   <tr class="row0">
-    <td><?php echo JText::_('External Links'); ?></td>
+    <td><?php echo JP_EXTERNAL_LINKS ; ?></td>
     <td>
     <?php
     global $database;
@@ -131,7 +131,7 @@ function jpControlPanel()
   </tr>
 
   <tr class="row0">
-    <td><?php echo JText::_('Images'); ?></td>
+    <td><?php echo JP_IMAGES ; ?></td>
     <td>
     <?php
     global $database;
@@ -189,7 +189,7 @@ function jpIndexForm()
 <table class="adminheading">
 <tr>
 	<th class="searchtext">
-	SE Simulation
+	<?php echo JP_SE_SIMULATION ; ?>
 	</th>
 </tr>
 </table>
@@ -209,8 +209,8 @@ function jpIndexForm()
     <table class="adminlist">
       <TR>
         <TH width="1%"><input type="checkbox" name="toggle" value="" onclick="checkAll(100);"></TH>
-        <TH><?php echo JText::_('Simulation Date'); ?></TH>
-        <TH><?php echo JText::_('Indexed links'); ?></TH>
+        <TH><?php echo JP_SIMULATION_DATE ; ?></TH> 
+        <TH><?php echo JP_INDEXED_LINKS ; ?></TH>
       </TR>
 
 <?php
@@ -224,7 +224,7 @@ function jpIndexForm()
           <tr <?php echo 'class="row' . $k . '"'; ?>>
             <td><?php echo mosHTML::idBox($i, $simtime) ?></td>
             <td align="center"><a href="<?php echo
-'index2.php?option=com_jp&task=reports&simtime=' . $simtime; ?>" title="Show report"><?php echo
+'index2.php?option=com_jp&task=reports&simtime=' . $simtime; ?>" title="Показать отчет"><?php echo
 $row->simtime ?></a></td>
             <td align="center"><?php echo $row->links ?></td>
           </tr>  
@@ -236,7 +236,7 @@ $row->simtime ?></a></td>
         echo '</table>';
 
     } else {
-        echo '<span style="padding-bottom: 20px; padding-top: 20px; text-align: center; font-size: 14px; font-weight: bold;">Not completed simulations !</span>';
+        echo '<span style="padding-bottom: 20px; padding-top: 20px; text-align: center; font-size: 14px; font-weight: bold;">Нет законченных эмуляций!</span>';
     }
 
 ?>
@@ -287,7 +287,7 @@ function jpEndSimulate()
     
 <table class="adminheading"><tr><th class="searchtext"><?php echo $adminMessage ?></th></tr></table>
 <table class="adminform">
-<tr><th><?php echo JText::_('Simulation status'); ?></th></tr>
+<tr><th><?php echo JP_SIMULATION_STATUS ; ?></th></tr>
 <tr>
 <td style="padding-bottom: 20px; padding-top: 20px; text-align: center; font-size: 14px; font-weight: bold;">
 <?php echo $infoMessage; ?>
@@ -306,7 +306,7 @@ function jpSimulate()
     
 <table class="adminheading"><tr><th class="searchtext">New Simulation</th></tr></table>
 <table class="adminform">
-<tr><th colspan="3"><?php echo JText::_('Simulation Options'); ?></th></tr>
+<tr><th colspan="3"><?php echo JP_SIMULATION_OPTIONS ; ?></th></tr>
 <tr valign="top">
     <TD width="50%">
       <FIELDSET>
@@ -333,13 +333,13 @@ Depending on server setup and number of site pages, operation of SE simulation m
     </td>
 	<td>
 <select name="indcount" id="countind" style="width: 100px;">
-	<option value="5">5 pages</option>
-	<option value="10" SELECTED>10 pages</option>
-	<option value="15">15 pages</option>
-	<option value="20">20 pages</option>
-	<option value="30">30 pages</option>
-	<option value="50">50 pages</option>
-	<option value="100">100 pages</option>
+	<option value="5">5 страниц</option>
+	<option value="10" SELECTED>10 страниц</option>
+	<option value="15">15 страниц</option>
+	<option value="20">20 страниц</option>
+	<option value="30">30 страниц</option>
+	<option value="50">50 страниц</option>
+	<option value="100">100 страниц</option>
 </select>
 	</td>
 </tr>
@@ -406,7 +406,7 @@ function jxListPagesHtml()
 		<table class="adminheading">
 		<tr>
 			<th style="background: url(<?php echo $mosConfig_live_site; ?>/administrator/components/com_jp/images/searchtext.png) no-repeat left;">
-			SEF URLs
+			<?php echo JP_SEF_URL_NAME ; ?>
 			</th>
 		</tr>
 		</table>
