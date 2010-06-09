@@ -41,7 +41,7 @@ class JEConfig
 		<table class="adminheading">
 		<tr>
 			<th class="config">
-			Configuration
+			<?php echo JP_CONFIGURATION1 ;?>
 			</th>
 		</tr>
 		</table>
@@ -55,7 +55,7 @@ class JEConfig
         //echo "<br>";
         $option = mosGetParam($_REQUEST, 'option', false);
         if (!$option)
-            josRedirect('index2.php', JText::_('Cannot get Component name in JEConfig'));
+            josRedirect('index2.php', JP_CGN );
 
         $sql = "SELECT name FROM #__je_config WHERE component = '{$option}' ORDER BY `section` ASC, fieldset ASC, type  ASC ";
         $database->setQuery($sql);
@@ -233,7 +233,7 @@ class JEConfig
         if (!$option)
             $option = mosGetParam($_REQUEST, 'option', false);
         if (!$option) {
-            echo "Cannot save. No Option";
+            echo JP_ERROR1 ;
             return;
         }
         $sql = "SELECT * FROM #__je_config WHERE `component` = '{$option}' AND hidden = 'N'";
