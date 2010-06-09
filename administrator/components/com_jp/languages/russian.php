@@ -68,11 +68,25 @@ define("JP_STATUS", "Статус");
 // Тулбар
 // Сео Тулзы
 define("JP_TOP_CPANEL", "JPromoter =)");
-define("JP_TOP_SITE_MAP", "Карта Сайта");
+define("JP_TOP_SITE_MAP", "Сгенерировать СайтМэп");
 define("JP_TOP_INTEGRATION", "Интеграция");
 // Эмулятор Поисковика
-define("JP_TOP_NEW", "Новый");
+define("JP_TOP_NEW", "Новая");
 define("JP_TOP_DELETE", "Удалить");
+define("JP_SKIP_DIRECTORIES", "Не включать директории");
+define("JP_SKIP_DIRECTORIES_TXT", "Введите ниже директории, которые не надо включать. Каждая директория должна начинаться с новой строки и со слеша! Например:");
+define("JP_COIP", "Счетчик индексированных страниц");
+define("JP_MNOGO_TEXTA", "Из-за установки сервиса и множества страниц операция симуляции поисковой системы будет очень медленным и отнимет много времени.Во избежании потери времени весь процесс поделен на 2 стадии. Выберите максимальное количество страниц, которое потом будет индексировано в течении одной стадии.");
+define("JP_SKIP_COMPONENTS", "Пропустить компоненты");
+define("JP_SKIP_COM_TEXT", "Ответьте галочками, какие компоненты необходимо пропустить");
+define("JP_START", "Погнали!");
+define("JP_NEW_SIMULATION", "Новая симуляция");
+define("JP_", "");
+define("JP_", "");
+define("JP_", "");
+define("JP_", "");
+define("JP_", "");
+define("JP_", "");
 // СЕО линкс
 define("JP_TOP_HU", "Показ|Спрят СайтМэп");
 define("JP_TOP_HU2", "Показ|Спрят");
@@ -83,10 +97,10 @@ define("JP_TOP_NO_FOLLOW", "No Folow");
 define("JP_TOP_GET_RANKS", "Get Rank");
 define("JP_TOP_CLEAR_SEF", "Очистить SEF");
 
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
+define("JP_NAME", "Название");
+define("JP_DATE", "Дата");
+define("JP_INFORMATION", "Информация");
+define("JP_BAD_SITEMAP_GENERATED", "Ни одна карта сайта не сгенерирована. Пожалуйста, кликните на волшебную кнопочку сверху, чтобы сгенерировать ее.");
 define("JP_", "");
 define("JP_", "");
 define("JP_", "");
