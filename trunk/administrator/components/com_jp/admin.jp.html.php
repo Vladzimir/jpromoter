@@ -303,14 +303,14 @@ function jpSimulate()
 {
 ?>
     
-<table class="adminheading"><tr><th class="searchtext">New Simulation</th></tr></table>
+<table class="adminheading"><tr><th class="searchtext"><?php echo JP_NEW_SIMULATION ;?></th></tr></table>
 <table class="adminform">
 <tr><th colspan="3"><?php echo JP_SIMULATION_OPTIONS ; ?></th></tr>
 <tr valign="top">
     <TD width="50%">
       <FIELDSET>
-        <LEGEND>Skip Directories</LEGEND>
-Please, enter skip directories in text area. Each directory must beginning from root - <b>" / "</b>. For example:
+        <LEGEND><?php echo JP_SKIP_DIRECTORIES ;?></LEGEND>
+<?php echo JP_SKIP_DIRECTORIES_TXT ;?> <!-- Please, enter skip directories in text area. Each directory must beginning from root - <b>" / "</b>. For example: -->
 <p>
 <strong>
 /affiliates<br />
@@ -323,12 +323,12 @@ Please, enter skip directories in text area. Each directory must beginning from 
     </TD>
     <TD width="50%">
       <FIELDSET>
-        <LEGEND>Count of indexed pages</LEGEND>
+        <LEGEND><?php echo JP_COIP ;?></LEGEND>
         
 <table>
 <tr>
 	<td>
-Depending on server setup and number of site pages, operation of SE simulation may be very slow and take a lot of time. To avoid timeout the whole process is divided into stages. Please choose the maximum number of pages which will be indexed during the one stage.
+<?php echo JP_MNOGO_TEXTA ;?> <!--Depending on server setup and number of site pages, operation of SE simulation may be very slow and take a lot of time. To avoid timeout the whole process is divided into stages. Please choose the maximum number of pages which will be indexed during the one stage. -->
     </td>
 	<td>
 <select name="indcount" id="countind" style="width: 100px;">
@@ -345,8 +345,8 @@ Depending on server setup and number of site pages, operation of SE simulation m
 </table>
       </FIELDSET>
       <fieldset>
-      <legend><?php echo JText::_('Skip components'); ?> </legend>
-Please, mark skip components.
+      <legend><?php echo JP_SKIP_COMPONENTS ; ?> </legend>
+<?php echo JP_SKIP_COM_TEXT ;?>
 <table>
 <?php
     global $mosConfig_absolute_path;
@@ -1736,7 +1736,7 @@ function jpGoogleTools()
 		<table class="adminheading">
 		<tr>
 			<th style="background: url(<?php echo $mosConfig_live_site; ?>/administrator/components/com_jp/images/google.png) no-repeat left;">
-			SEO Tools
+			<?php echo JP_SEO_TOOLS ;?>
 			</th>
 		</tr>
 		</table>
@@ -1744,9 +1744,9 @@ function jpGoogleTools()
 
     <table width="100%" border = "0"  class="adminlist">
         <tr>
-            <th width="160" align="left">Name</th>
-            <th width="120" align="left">Date</th>
-            <th align="left">Information</th>                        
+            <th width="160" align="left"><?php echo JP_NAME ;?></th>
+            <th width="120" align="left"><?php echo JP_DATE ;?></th>
+            <th align="left"><?php echo JP_INFORMATION ;?></th>                        
         </tr>
         <tr class="row0">
             <td><?php echo $rows[0]['name']; ?></td>
@@ -1755,10 +1755,10 @@ function jpGoogleTools()
     if ($rows[0]['value']) {
         echo $rows[0]['value'];
 ?>
-                   <a href="<?php echo $rows[0]['value'] ?>" target="_blank"><img src="components/com_jp/images/opendetail.png" border="0" align="absmiddle" title="Open this link in new window"></a>
+                   <a href="<?php echo $rows[0]['value'] ?>" target="_blank"><img src="components/com_jp/images/opendetail.png" border="0" align="absmiddle" title="Открыть в новом окне"></a>
                 <?php
     } else {
-        JText::_('No site map Generated. Please, click Site Map button on ToolBar to generate one.');
+        echo JP_BAD_SITEMAP_GENERATED ;
     }
 ?>
             

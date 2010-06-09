@@ -145,11 +145,11 @@ class jpToolBar
         mosMenuBar::startTable();
         mosMenuBar::spacer();
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
-        mosMenuBar::custom('startsimulate', 'apply.png', 'apply_f2.png', JText::_('Start'), false, false);
+        mosMenuBar::custom('startsimulate', 'apply.png', 'apply_f2.png', JP_START, false, false);
         mosMenuBar::spacer();
         //        mosMenuBar::custom('nextsimulate', 'next.png', 'next_f2.png', JText::_('Next'), true, true );
         //        mosMenuBar::spacer();
@@ -164,7 +164,7 @@ class jpToolBar
         mosMenuBar::startTable();
         mosMenuBar::spacer();
         mosMenuBar::custom('panel', '../../../components/com_jp/images/cpanel.png',
-            '../../../components/com_jp/images/cpanel.png', JText::_('cPanel'), false, false);
+            '../../../components/com_jp/images/cpanel.png', JP_TOP_CPANEL, false, false);
         mosMenuBar::spacer();
         mosMenuBar::divider();
         mosMenuBar::spacer();
