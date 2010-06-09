@@ -81,12 +81,6 @@ define("JP_SKIP_COMPONENTS", "Пропустить компоненты");
 define("JP_SKIP_COM_TEXT", "Ответьте галочками, какие компоненты необходимо пропустить");
 define("JP_START", "Погнали!");
 define("JP_NEW_SIMULATION", "Новая симуляция");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
 // СЕО линкс
 define("JP_TOP_HU", "Показ|Спрят СайтМэп");
 define("JP_TOP_HU2", "Показ|Спрят");
@@ -101,9 +95,10 @@ define("JP_NAME", "Название");
 define("JP_DATE", "Дата");
 define("JP_INFORMATION", "Информация");
 define("JP_BAD_SITEMAP_GENERATED", "Ни одна карта сайта не сгенерирована. Пожалуйста, кликните на волшебную кнопочку сверху, чтобы сгенерировать ее.");
-define("JP_", "");
-define("JP_", "");
-define("JP_", "");
+// Конфигурационный файл
+define("JP_CONFIGURATION1", "Настройка JPromoter =)");
+define("JP_CGN", "Не могу опознать имя компонента в конфигурации");
+define("JP_ERROR1", "Не могу сохранить, нет опций.");
 define("JP_", "");
 define("JP_", "");
 define("JP_", "");
