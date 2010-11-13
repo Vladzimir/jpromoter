@@ -256,6 +256,8 @@ CREATE TABLE #__jp_pages (
       <filename>images/sitemap.gif</filename>  
       <filename>images/spacer.gif</filename>
       <filename>images/opendetail.png</filename>
+      <filename>languages/russian.php</filename>
+      <filename>languages/index.html</filename>
     </images>
     
   </administration>
