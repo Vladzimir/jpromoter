@@ -8,16 +8,12 @@
  * Для получения информации о используемых расширениях и замечаний об авторском праве, смотрите файл help/copyright.php.
  */
 defined('_VALID_MOS') or die('Restricted access');
-if (file_exists(JPATH_BASE . '/administrator/components/com_jp/languages/' .
-    Jconfig::getInstance()->config_lang . '.php')) {
-    require_once (JPATH_BASE . '/administrator/components/com_jp/languages/' .
-        Jconfig::getInstance()->config_lang . '.php');
+
+if (file_exists(JPATH_BASE . '/administrator/components/com_jp/languages/' . Jconfig::getInstance()->config_lang . '.php')) {
+require_once (JPATH_BASE . '/administrator/components/com_jp/languages/' . Jconfig::getInstance()->config_lang . '.php');
 } else {
-    require_once (JPATH_BASE .
-        '/administrator/components/com_jp/languages/russian.php');
+require_once (JPATH_BASE.'/administrator/components/com_jp/languages/russian.php');
 }
-
-
 error_reporting(E_ALL);
 @session_start();
 

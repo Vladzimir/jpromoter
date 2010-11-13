@@ -79,7 +79,7 @@
 			<value>/{lang}</value>
 		</var>
 		<var name="pagenumber" type="query">
-	   		<query>SELECT ({limitstart} div {limit}) + 1</query>
+	   		<query>SELECT ({limitstart} / {limit}) + 1</query>
 		   <empty>?</empty>
 		</var>
 		<var name="limitstart" type="string">

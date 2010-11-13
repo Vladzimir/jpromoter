@@ -56,7 +56,7 @@
            (NULL,'com_jp','SEF', 'URL for update SEF integrations', 'jp_sef_xml_url', 'text', 'URL for update SEF component integrations', '', '', 'N', 'SEF Configuration'),
            (NULL,'com_jp','SEF', 'Enable work without mod_rewrite', 'jp_mod_rewrite', 'yesno', 'Enable - disable work without mod_rewrite', '', '0', 'N', 'SEF Configuration'),
            (NULL,'com_jp','SEF', 'Enable url tranlit', 'jp_url_translit', 'yesno', 'Enable - disable transliteration URL', '', '0', 'N', 'SEF Configuration'),
-           (NULL,'com_jp','SEF', 'Enable cache', 'jp_cache', 'yesno', 'Enable - disable cache', '', '1', 'N', 'SEF Configuration');
+           (NULL,'com_jp','SEF', 'Enable cache', 'jp_cache', 'yesno', 'Enable - disable cache', '', '0', 'N', 'SEF Configuration');
        ]]></query>
       <!-- JP IMAGES -->
       <query id="4"><![CDATA[DROP TABLE IF EXISTS #__jp_images;]]></query>
