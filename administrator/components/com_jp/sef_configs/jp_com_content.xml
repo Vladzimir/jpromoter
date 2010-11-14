@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sefconfig component="com_content">
-	<!-- 3:57 PM 2008-04-10 -->
 <!-- Для первой страницы -->		
 		<cond task="blogcategory|blogsection|archivecategory|archivesection" id="0" limit="*" limitstart="0" Itemid="*">
 			<tpl>{language}/{table}{menuitem}.html</tpl>
@@ -68,24 +67,20 @@
 			<query>SELECT LOWER(IF(c.catid != 0, CONCAT(s.`title`, '/', ct.`title`, '/', c.`title`), c.`title`)) FROM `#__content` AS c LEFT JOIN `#__categories` AS ct ON ct.id = c.catid LEFT JOIN `#__sections` AS s on s.id = c.sectionid WHERE c.`id` = {id}</query>
 			<empty>?</empty>
 		</var>
-		<!--<var name="pagenumber" type="query">
-			<query>SELECT ({limitstart} div {limit}) + 1</query>
-			<empty>?</empty>
-		</var>-->
 		<var name="Returnid" type="string">
 			<value>{Returnid}</value>
 		</var>
 		<var name="language" type="string" ifpresent="lang">
 			<value>/{lang}</value>
 		</var>
-		<var name="pagenumber" type="query">
-	   		<query>SELECT ({limitstart} / {limit}) + 1</query>
-		   <empty>?</empty>
-		</var>
+
 		<var name="limitstart" type="string">
 			<value>{limitstart}</value>
 		</var>
 		<var name="limit" type="string">
 			<value>{limit}</value>
 		</var>
+        <var name="pagenumber" type="string">
+            <value>{limitstart}/{limit}+1</value>
+        </var>
 </sefconfig>

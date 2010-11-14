@@ -218,7 +218,7 @@ if ( Jconfig::getInstance()->config_sef and ( !$foundURL ) )
         */
         $jdir = Jstring::str_ireplace( 'index.php', '', $_SERVER['PHP_SELF'] ) ;
         $juri = Jstring::str_ireplace( $jdir, '', $_SERVER['REQUEST_URI'] ) ;
-        if ( $juri != '' && $juri != '/' && !mb_eregi( "index\.php", $_SERVER['REQUEST_URI'] ) && !mb_eregi( "index2\.php", $_SERVER['REQUEST_URI'] ) && !mb_eregi( "/\?",
+        if ( $juri != '' && $juri != '/' && !preg_match( "/index.php/i", $_SERVER['REQUEST_URI'] ) && !preg_match( "/index2.php/i", $_SERVER['REQUEST_URI'] ) && !preg_match( "/\?/i",
             $_SERVER['REQUEST_URI'] ) && $_SERVER['QUERY_STRING'] == '' )
         {
             header( 'HTTP/1.0 404 Not Found' ) ;
@@ -243,13 +243,17 @@ function sefRelToAbs( $string )
     }
     $string = Jstring::ltrim( $string, '/' ) ;
     //multilingual code url support
-    if ( Jconfig::getInstance()->config_sef && Jconfig::getInstance()->config_multilingual_support && $string != 'index.php' && !mb_eregi( "^(([^:/?#]+):)", $string ) &&
-        !strcasecmp( Jstring::substr( $string, 0, 9 ), 'index.php' ) && !mb_eregi( 'lang=', $string ) )
+    if ( Jconfig::getInstance()->config_sef && Jconfig::getInstance()->config_multilingual_support && $string != 'index.php' && !preg_match( "/^(([^:/?#]+):)/i", $string ) &&
+        !strcasecmp( Jstring::substr( $string, 0, 9 ), 'index.php' ) && !preg_match( '/lang=/i', $string ) )
     {
         $string .= '&amp;lang=' . $iso_client_lang ;
     }
+    // если ссылка идёт на компонент главной страницы - очистим её
+	if (Jconfig::getInstance()->config_sef && Jconfig::getInstance()->config_com_frontpage_clear && strpos($string, 'option=com_frontpage') > 0 && !(strpos($string, 'limit'))) {
+		$string = '';
+	}
     // SEF URL Handling
-    if ( Jconfig::getInstance()->config_sef && !mb_eregi( "^(([^:/?#]+):)", $string ) && !strcasecmp( Jstring::substr( $string, 0, 9 ), 'index.php' ) )
+    if ( Jconfig::getInstance()->config_sef && !preg_match( "/^(([^:\/\?#]+):)/i", $string ) && !strcasecmp( Jstring::substr( $string, 0, 9 ), 'index.php' ) )
     {
         // Replace all &amp; with &
         $string = str_replace( '&amp;', '&', $string ) ;
@@ -265,7 +269,7 @@ function sefRelToAbs( $string )
         if ( isset( $url['fragment'] ) )
         {
             // ensure fragment identifiers are compatible with HTML4
-            if ( preg_match( '@^[A-Za-z][A-Za-z0-9:_.-]*$@', $url['fragment'] ) )
+            if ( preg_match( '/^[A-Za-z][A-Za-z0-9:_.-]*$/i', $url['fragment'] ) )
             {
                 $fragment = '#' . $url['fragment'] ;
             }
@@ -507,7 +511,7 @@ function sefRelToAbs( $string )
         if ( $resultUrl == '' ) $resultUrl = '/' . $string ;
         $fst = preg_quote( "option=" ) ;
         $scd = preg_quote( "&" ) ;
-        $_result = preg_match( "#$fst(.*?)$scd#", $database->getEscaped( $originalURL ), $matches ) ;
+        $_result = preg_match( "/$fst(.*?)$scd/i", $database->getEscaped( $originalURL ), $matches ) ;
         if ( $_result )
         {
             $_comp = $matches[1] ;
@@ -546,7 +550,7 @@ function sefRelToAbs( $string )
             {
                 // splits http(s)://xx.xx/yy/zz..." into [1]="http(s)://xx.xx" and [2]="/yy/zz...":
                 $live_site_parts = array() ;
-                mb_eregi( "^(https?:[\/]+[^\/]+)(.*$)", Jconfig::getInstance()->config_live_site, $live_site_parts ) ;
+                preg_match( "/^(https?:[\/]+[^\/]+)(.*$)/i", Jconfig::getInstance()->config_live_site, $live_site_parts ) ;
                 $string = $live_site_parts[1] . $string ;
             }
             else
