@@ -46,23 +46,6 @@ function urlTranslit( $string )
     $string = Jstring::trim( $string, '-' ) ;
     return $string ;
 }
-class newdb extends database
-{
-    public function loadRowArray( $key, $value )
-    {
-        if ( !( $cur = $this->query() ) )
-        {
-            return null ;
-        }
-        $array = array() ;
-        while ( $row = mysql_fetch_object( $cur ) )
-        {
-            $array[$row->$key] = $row->$value ;
-        }
-        mysql_free_result( $cur ) ;
-        return $array ;
-    }
-}
 // JPromoter END ---------------------------------------------------------------
 if ( Jconfig::getInstance()->config_sef )
 {
@@ -78,20 +61,20 @@ if ( Jconfig::getInstance()->config_sef )
         }
         else
         {
-        $originalAndSefUrls = newdb::getInstance()->setQuery( 'SELECT original , sef
+            $originalAndSefUrls = database::getInstance()->setQuery( 'SELECT original, sef
 						FROM #__jp_pages' )->loadRowArray( 'original', 'sef' ) ;
             if ( !file_exists( JP_CACHEPATH . '/jp/' ) )
             {
                 mkdir( JP_CACHEPATH . '/jp/', 0777 ) ;
             }
             $temp_file_name = microtime( 1 ) ;
-            file_put_contents( JP_CACHEPATH . '/jp/' . $temp_file_name, '<?php $originalAndSefUrls = ' . var_export( $originalAndSefUrls,true ) . '; ?>' ) ;
+            file_put_contents( JP_CACHEPATH . '/jp/' . $temp_file_name, '<?php $originalAndSefUrls = ' . var_export( $originalAndSefUrls, true ) . '; ?>' ) ;
             rename( JP_CACHEPATH . '/jp/' . $temp_file_name, JP_CACHEPATH . '/jp/sef.php' ) ;
         }
     }
     else
     {
-        $originalAndSefUrls = newdb::getInstance()->setQuery( 'SELECT original , sef
+        $originalAndSefUrls = database::getInstance()->setQuery( 'SELECT original, sef
 						FROM #__jp_pages' )->loadRowArray( 'original', 'sef' ) ;
     }
     if ( Jstring::substr( $_SERVER['REQUEST_URI'], 0, 10 ) != '/index.php' )
@@ -114,22 +97,22 @@ if ( Jconfig::getInstance()->config_sef )
             $fragment = Jstring::substr( $inURL, $sharpPos ) ;
             $inURL = Jstring::substr( $inURL, 0, $sharpPos ) ;
         }
-        $array_search = array_search( $inURL, @$originalAndSefUrls );
-
+        $array_search = array_search( $inURL, @$originalAndSefUrls ) ;
         if ( $array_search )
         {
-            if (@$originalAndSefUrls[$array_search] != ''){
-            $_SERVER['REQUEST_URI'] = $sitePath . $array_search . $fragment ;
-            //echo $_SERVER['REQUEST_URI'];
-            $pUrl = parse_url( $_SERVER['REQUEST_URI'] ) ;
-            if ( isset( $pUrl['query'] ) )
+            if ( @$originalAndSefUrls[$array_search] != '' )
             {
-                $_SERVER['QUERY_STRING'] = $pUrl['query'] ;
-                parse_str( $pUrl['query'], $pQuery ) ;
-                $_REQUEST = $_REQUEST + $pQuery ;
-                $_GET = $_GET + $pQuery ;
-            }
-            $foundURL = true ;
+                $_SERVER['REQUEST_URI'] = $sitePath . $array_search . $fragment ;
+                //echo $_SERVER['REQUEST_URI'];
+                $pUrl = parse_url( $_SERVER['REQUEST_URI'] ) ;
+                if ( isset( $pUrl['query'] ) )
+                {
+                    $_SERVER['QUERY_STRING'] = $pUrl['query'] ;
+                    parse_str( $pUrl['query'], $pQuery ) ;
+                    $_REQUEST = $_REQUEST + $pQuery ;
+                    $_GET = $_GET + $pQuery ;
+                }
+                $foundURL = true ;
             }
         }
     }
