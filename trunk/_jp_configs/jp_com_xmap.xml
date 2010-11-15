@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Configuration SEF URLs in Joostina for JPromoter -->
+<sefconfig component="com_xmap">
+    <cond Itemid="*">       
+		<tpl>{lang}/{holder}/</tpl>
+    </cond>
+	
+<!-- Variables -->
+
+   <var name="holder" type="string">
+        <value>sitemap</value>
+   </var>
+
+	 <var name="lang" type="string" ifpresent="lang">
+        <value>/{lang}</value>
+   </var>
+</sefconfig>
+

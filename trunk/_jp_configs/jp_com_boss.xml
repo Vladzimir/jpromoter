@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Configuration SEF URLs in Joomla for JPromoter 11:18 AM 2008-04-29-->
+<sefconfig component="com_boss">
+	
+	<cond  task="write_content" catid="*">
+        <tpl>/{holder}/{directoryName}/write_content/{slug}.html</tpl>
+    </cond>
+	
+	<cond  task="show_category" catid="*" order="0" expand="0" limit="*" limitstart="*">
+        <tpl>/{holder}/{directoryName}/{parents}{catid}/page-{pagenum}{text_search}.html</tpl>
+    </cond>
+	
+	<cond  task="show_category" catid="*" order="*" expand="*" limit="*" limitstart="*">
+        <tpl>/{holder}/{directoryName}/order-{order}/expand-{expand}/{parents}{catid}/page-{pagenum}{text_search}.html</tpl>
+    </cond>
+	
+	<cond  task="show_category" catid="*" order="0" expand="0">
+        <tpl>/{holder}/{directoryName}/{parents}{catid}{text_search}.html</tpl>
+    </cond>
+		
+	<cond  task="show_category" catid="*" order="*" expand="*">
+        <tpl>/{holder}/{directoryName}/order-{order}/expand-{expand}/{parents}{catid}{text_search}.html</tpl>
+    </cond>
+
+    <cond  task="show_category" catid="*" order="0">
+        <tpl>/{holder}/{directoryName}/{parents}{catid}{text_search}.html</tpl>
+    </cond>
+
+	<cond  task="show_category" catid="*" order="*">
+        <tpl>/{holder}/{directoryName}/order-{order}/{parents}{catid}{text_search}.html</tpl>
+    </cond>
+	
+	<cond  task="*" userid="*" order="*" expand="*" limit="*" limitstart="*">
+        <tpl>/{holder}/{directoryName}/{task}/order-{order}/expand-{expand}/{userid}/page-{pagenum}{text_search}.html</tpl>
+    </cond>
+    
+	<cond  task="*" order="*" expand="*" limit="*" limitstart="*">
+        <tpl>/{holder}/{directoryName}/{task}/expand-{expand}/order-{order}/page-{pagenum}{text_search}.html</tpl>
+    </cond>
+    
+	<cond  task="*" catid="*" order="*" expand="*">
+        <tpl>/{holder}/{directoryName}/{task}/order-{order}/expand-{expand}/{slug}{text_search}.html</tpl>
+    </cond>
+	
+	<cond  task="*" usertid="*" order="*" expand="*">
+        <tpl>/{holder}/{directoryName}/{task}/order-{order}/expand-{expand}/{usertid}{text_search}.html</tpl>
+    </cond>
+
+	<cond  task="*" order="*" expand="*">
+        <tpl>/{holder}/{directoryName}/{task}/order-{order}/expand-{expand}{text_search}.html</tpl>
+    </cond>
+
+	<cond  task="show_content" contentid="*" catid="*" slug="*">
+        <tpl>/{holder}/{directoryName}/{parents}{slug}/{contentid}.html</tpl>
+    </cond>
+
+    <cond  task="show_content" contentid="*" catid="*">
+        <tpl>/{holder}/{directoryName}/{parents}{catid}/{contentid}.html</tpl>
+    </cond>
+	
+	<cond  task="show_content" contentid="*">
+        <tpl>/{holder}/{directoryName}/{contentid}.html</tpl>
+    </cond>
+	
+    <cond  task="*" contentid="*" mode="*">
+        <tpl>/{holder}/{directoryName}/{task}/{contentid}/{mode}.html</tpl>
+    </cond>
+
+	<cond  task="*" catid="*" mode="*">
+        <tpl>/{holder}/{directoryName}/{task}/{slug}/{mode}.html</tpl>
+    </cond>
+
+	<cond  task="*" catid="*">
+        <tpl>/{holder}/{directoryName}/{task}/{slug}{no_html}.html</tpl>
+    </cond>
+	
+	<cond  task="*" limit="*" limitstart="*">
+        <tpl>/{holder}/{directoryName}/{task}/page-{pagenum}.html</tpl>
+    </cond>
+
+	<cond  task="*" contentid="*">
+        <tpl>/{holder}/{directoryName}/{task}/{contentid}.html</tpl>
+    </cond>
+
+	<cond  task="*" userid="*">
+        <tpl>/{holder}/{directoryName}/{task}/{userid}.html</tpl>
+    </cond>
+
+	<cond  task="show_user">
+        <tpl>/{holder}/{directoryName}/show_user{mosmsg}.html</tpl>
+    </cond>
+
+	<cond  task="*">
+        <tpl>/{holder}/{directoryName}/{task}.html</tpl>
+    </cond>
+
+	<cond>
+        <tpl>/{holder}/{directoryName}.html</tpl>
+    </cond>
+<!-- Variables -->
+	<var name="pagenum" type="query">
+	    <query>select ({limitstart} div {limit} + 1)</query>
+        <empty>0</empty>
+	</var>
+
+	<var name="contentid" type="query">
+	      <query>SELECT LOWER(slug) FROM `#__boss_{directory}_contents` where `id` = {contentid}</query>
+        <empty>?</empty>
+	</var>
+
+	<var name="catid" type="query">
+	    <query>SELECT LOWER(slug) FROM `#__boss_{directory}_categories` where `id` = {catid}</query>
+        <empty>root</empty>
+	</var>
+
+    <var name="parents" type="query">
+	      <query>
+		    SELECT
+		    LOWER(
+		    IF(m.parent != 0,CONCAT(
+		    IF(p1.parent != 0,CONCAT(
+		    IF(p2.parent != 0,CONCAT(
+		    IF(p3.parent != 0,CONCAT(
+		    IF(p4.parent != 0,CONCAT(
+		    IF(p5.parent != 0,CONCAT(
+		    IF(p6.parent != 0,CONCAT(
+		    IF(p7.parent != 0,CONCAT(
+		    IF(p8.parent != 0,CONCAT(
+		    p9.slug, '/'),''),
+		    p8.slug, '/'),''),
+		    p7.slug, '/'),''),
+		    p6.slug, '/'),''),
+		    p5.slug, '/'),''),
+		    p4.slug, '/'),''),
+		    p3.slug, '/'),''),
+		    p2.slug, '/'),''),
+		    p1.slug, '/'),'')
+		    )
+		    FROM #__boss_{directory}_categories AS m
+		    LEFT JOIN #__boss_{directory}_categories AS p1 ON p1.id = m.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p2 ON p2.id = p1.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p3 ON p3.id = p2.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p4 ON p4.id = p3.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p5 ON p5.id = p4.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p6 ON p6.id = p5.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p7 ON p7.id = p6.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p8 ON p8.id = p7.parent
+		    LEFT JOIN #__boss_{directory}_categories AS p9 ON p9.id = p8.parent
+		    WHERE m.id = {catid}
+		  </query>
+        <empty></empty>
+    </var>
+
+	<var name="userid" type="query">
+	      <query>SELECT LOWER(name) FROM `#__users` where `id` = {userid}</query>
+        <empty>?</empty>
+	</var>
+	
+	<var name="task" type="string">
+        <value>{task}</value>
+	</var>
+
+    <var name="directory" type="string">
+        <value>{directory}</value>
+	</var>
+
+    <var name="directoryName" type="query">
+        <query>SELECT LOWER(slug) FROM `#__boss_config` where `id` = {directory}</query>
+        <empty>{directory}</empty>
+	</var>
+
+    <var name="slug" type="string">
+        <value>{slug}</value>
+	</var>
+	 
+	 <var name="mode" type="string">
+        <value>{mode}</value>
+	</var>
+	 
+	 <var name="text_search" type="string" ifpresent="text_search">
+        <value>/{text_search}</value>
+	</var>
+	 
+	 <var name="order" type="string">
+        <value>{order}</value>
+	</var>
+	 
+	 <var name="expand" type="string">
+        <value>{expand}</value>
+	</var>
+	
+	<var name="holder" type="string">
+        <value>boss</value>
+	</var>
+  	 
+	<var name="mosmsg" type="string" ifpresent="mosmsg">
+        <value>/{mosmsg}</value>
+	</var>
+	 
+	<var name="no_html" type="string" ifpresent="no_html">
+		<value>/no_html_{no_html}</value>
+	</var>	 
+
+</sefconfig>
