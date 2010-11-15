@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Configuration SEF URLs in Joostina for JPromoter -->
+
+<sefconfig component="com_poll">
+	<!-- /index.php?option=com_poll&task=results&id=14&Itemid=0 -->
+    <cond task="results" id="*" Itemid="*">
+        <tpl>{lang}/{holder}/{id}/</tpl>
+    </cond>
+    <!-- /index.php?option=com_poll&Itemid=34 -->
+    <cond Itemid="*">
+        <tpl>{lang}/{holder}/</tpl>
+    </cond>	
+	
+    <!-- Variables -->
+    <var name="holder" type="string">
+        <value>polls</value>
+    </var>
+	<var name="id" type="string">
+        <value>{id}</value>
+    </var>
+	<var name="task" type="string">
+        <value>{task}</value>
+    </var>
+    <var name="lang" type="string" ifpresent="lang">
+        <value>/{lang}</value>
+    </var>
+</sefconfig>
+

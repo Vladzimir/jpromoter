@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Configuration SEF URLs in Joostina for JPromoter -->
+<!-- Alexej Pozdnjakov [mosgaz] -->
+<!-- Woodell Web Works -->
+<!-- www.woodell.ru -->
+
+<sefconfig component="com_joigallery">
+  
+  <cond act="photos" cid="*" task="new">
+    <tpl>{lang}/{holder}/{category}{ender_cat}?upload</tpl>
+  </cond>
+
+  <cond act="photos" cid="*" task="edit">
+    <tpl>{lang}/{holder}/{image}-{cid}{ender_img}?edit</tpl>
+  </cond>
+  
+  <cond act="photos" cid="*" task="remove">
+    <tpl>{lang}/{holder}/{image}-{cid}{ender_img}?remove</tpl>
+  </cond>
+
+  <cond act="photos" task="new">
+    <tpl>{lang}/{holder}/?upload</tpl>
+  </cond>
+
+  <cond act="categories" cid="*" task="new" limit="*" limitstart="*">
+    <tpl>{lang}/{holder}/{category}{ender_cat}{pagenumber}</tpl>
+  </cond>
+  
+  <cond act="categories" cid="*" task="edit" limit="*" limitstart="*">
+    <tpl>{lang}/{holder}/{category}{ender_cat}{pagenumber}</tpl>
+  </cond>
+
+  <cond act="categories" cid="*" task="new">
+    <tpl>{lang}/{holder}/{category}{ender_cat}?add</tpl>
+  </cond>
+
+  <cond act="categories" task="new">
+    <tpl>{lang}/{holder}/?add</tpl>
+  </cond>
+  
+  <cond act="*" task="*" cid="*">
+    <tpl>{lang}/{holder}/{category}{ender_cat}?{task}</tpl>
+  </cond>
+
+  <cond act="categories" cid="*" limit="*" limitstart="*">
+    <tpl>{lang}/{holder}/{category}{ender_cat}{pagenumber}</tpl>
+  </cond>
+
+  <cond act="categories" cid="*">
+    <tpl>{lang}/{holder}/{category}{ender_cat}</tpl>
+  </cond>
+
+  <cond act="photos" cid="*">
+    <tpl>{lang}/{holder}/{image}-{cid}{ender_img}</tpl>
+  </cond>
+  	
+  <cond act="*">
+    <tpl>{lang}/{holder}/{act}/</tpl>
+  </cond>
+
+  <cond Itemid="*">
+    <tpl>{lang}/{holder}/</tpl>
+  </cond>
+
+
+  <!-- Variables -->
+  
+  <var name="category" type="query">
+    <query>
+     SELECT CONCAT(LOWER(if(cxref1.`parent_id` != 0, CONCAT(
+                           if(cxref2.`parent_id` != 0, CONCAT(
+                             if(cxref3.`parent_id` != 0, CONCAT(
+                               if(cxref4.`parent_id` != 0, CONCAT(
+                                 if(cxref5.`parent_id` != 0, CONCAT(
+                                 c6.`title`,'/',c5.`title`), c5.`title`)
+                               ,'/',c4.`title`), c4.`title`)
+                             ,'/',c3.`title`), c3.`title`)
+                           ,'/',c2.`title`), c2.`title`)
+                         ,'/',c1.`title`), c1.`title`)), '')
+     FROM      `#__categories` AS `cxref1`
+     LEFT JOIN `#__categories` AS `c1`      ON c1.`id`     = cxref1.`id`
+     LEFT JOIN `#__categories` AS `cxref2`  ON cxref2.`id` = cxref1.`parent_id`
+     LEFT JOIN `#__categories` AS `c2`      ON c2.`id`     = cxref2.`id`
+     LEFT JOIN `#__categories` AS `cxref3`  ON cxref3.`id` = cxref2.`parent_id`
+     LEFT JOIN `#__categories` AS `c3`      ON c3.`id`     = cxref3.`id`
+     LEFT JOIN `#__categories` AS `cxref4`  ON cxref4.`id` = cxref3.`parent_id`
+     LEFT JOIN `#__categories` AS `c4`      ON c4.`id`     = cxref4.`id`
+     LEFT JOIN `#__categories` AS `cxref5`  ON cxref5.`id` = cxref4.`parent_id`
+     LEFT JOIN `#__categories` AS `c5`      ON c5.`id`     = cxref5.`id`
+     LEFT JOIN `#__categories` AS `cxref6`  ON cxref6.`id` = cxref5.`parent_id`
+     LEFT JOIN `#__categories` AS `c6`      ON c6.`id`     = cxref6.`id`
+     WHERE cxref1.`id` = {cid}
+    </query>
+    <empty>?</empty>
+  </var>
+
+  <var name="image" type="query">
+    <query>
+     SELECT CONCAT(LOWER(if(img.`id` != 0, CONCAT(
+                           if(cxref1.`parent_id` != 0, CONCAT(
+                             if(cxref2.`parent_id` != 0, CONCAT(
+                               if(cxref3.`parent_id` != 0, CONCAT(
+                                 if(cxref4.`parent_id` != 0, CONCAT(
+                                   if(cxref5.`parent_id` != 0, CONCAT(
+                                   c6.`title`,'/',c5.`title`), c5.`title`)
+                                 ,'/',c4.`title`), c4.`title`)
+                               ,'/',c3.`title`), c3.`title`)
+                             ,'/',c2.`title`), c2.`title`)
+                           ,'/',c1.`title`), c1.`title`)
+                         ,'/',img.`name`), img.`name`)), '')
+     FROM      `#__joigallery` AS `img`
+     LEFT JOIN `#__categories` AS `cxref1`  ON cxref1.`id` = img.`cid`
+     LEFT JOIN `#__categories` AS `c1`      ON c1.`id`     = cxref1.`id`
+     LEFT JOIN `#__categories` AS `cxref2`  ON cxref2.`id` = cxref1.`parent_id`
+     LEFT JOIN `#__categories` AS `c2`      ON c2.`id`     = cxref2.`id`
+     LEFT JOIN `#__categories` AS `cxref3`  ON cxref3.`id` = cxref2.`parent_id`
+     LEFT JOIN `#__categories` AS `c3`      ON c3.`id`     = cxref3.`id`
+     LEFT JOIN `#__categories` AS `cxref4`  ON cxref4.`id` = cxref3.`parent_id`
+     LEFT JOIN `#__categories` AS `c4`      ON c4.`id`     = cxref4.`id`
+     LEFT JOIN `#__categories` AS `cxref5`  ON cxref5.`id` = cxref4.`parent_id`
+     LEFT JOIN `#__categories` AS `c5`      ON c5.`id`     = cxref5.`id`
+     LEFT JOIN `#__categories` AS `cxref6`  ON cxref6.`id` = cxref5.`parent_id`
+     LEFT JOIN `#__categories` AS `c6`      ON c6.`id`     = cxref6.`id`
+     WHERE img.`id` = {cid}
+
+    </query>
+    <empty>?</empty>
+  </var>
+
+  <var name="cid" type="string">
+    <value>{cid}</value>
+  </var>
+
+  <var name="task" type="string">
+    <value>{task}</value>
+  </var>
+
+  <var name="act" type="string">
+    <value>{act}</value>
+  </var>
+
+  <var name="pagenumber" type="query">
+    <query>SELECT ({limitstart} div {limit}) + 1</query>
+    <empty>?</empty>
+  </var>
+
+  <var name="holder" type="string">
+    <value>collections</value>
+  </var>
+
+  <!-- Окончание для страниц изображений. Например "html" (не забудьте проставить точки перед {ender_img}) или "/" -->
+  <var name="ender_img" type="string">
+    <value>/</value>
+  </var>
+
+  <!-- Окончание для страниц категорий. Например "html" (не забудьте проставить точки перед {ender_cat}) или "/" -->
+  <var name="ender_cat" type="string">
+    <value>/</value>
+  </var>
+
+  <var name="lang" type="string" ifpresent="lang">
+    <value>/{lang}</value>
+  </var>
+</sefconfig>
+
