@@ -66,7 +66,7 @@
 
   <!-- Variables -->
   
-  <var name="category" type="query">
+  <var name="category" type="query" ifpresent="cid">
     <query>
      SELECT CONCAT(LOWER(if(cxref1.`parent_id` != 0, CONCAT(
                            if(cxref2.`parent_id` != 0, CONCAT(
@@ -95,7 +95,7 @@
     <empty>?</empty>
   </var>
 
-  <var name="image" type="query">
+  <var name="image" type="query" ifpresent="cid">
     <query>
      SELECT CONCAT(LOWER(if(img.`id` != 0, CONCAT(
                            if(cxref1.`parent_id` != 0, CONCAT(
@@ -140,9 +140,8 @@
     <value>{act}</value>
   </var>
 
-  <var name="pagenumber" type="query">
-    <query>SELECT ({limitstart} div {limit}) + 1</query>
-    <empty>?</empty>
+  <var name="pagenumber" type="string">
+    <value>({limitstart} / {limit}) + 1</value>
   </var>
 
   <var name="holder" type="string">
@@ -163,4 +162,3 @@
     <value>/{lang}</value>
   </var>
 </sefconfig>
-

@@ -47,23 +47,23 @@
 			<tpl>{language}/edit/{content}.html</tpl>
 		</cond>
 
-		<var name="table" type="query">
+		<var name="table" type="query" ifpresent="task">
 			<query>SELECT IF('{task}' LIKE 'blog%', '', 'table/')</query>
 			<empty></empty>
 		</var>
-		<var name="menuitem" type="query">
+		<var name="menuitem" type="query" ifpresent="Itemid">
 			<query>SELECT LOWER(name) FROM `#__menu` WHERE `id` = {Itemid}</query>
 			<empty>?</empty>
 		</var>
-		<var name="section" type="query">
+		<var name="section" type="query" ifpresent="id">
 			<query>SELECT LOWER(title) FROM `#__sections` WHERE `id` = {id}</query>
 			<empty>?</empty>
 		</var>
-		<var name="category" type="query">
+		<var name="category" type="query" ifpresent="id">
 			<query>SELECT LOWER(CONCAT(s.`title`, '/', ct.title)) FROM `#__categories` AS ct LEFT JOIN `#__sections` AS s on s.id = ct.section WHERE ct.`id` = {id}</query>
 			<empty>?</empty>
 		</var>
-		<var name="content" type="query">
+		<var name="content" type="query" ifpresent="id">
 			<query>SELECT LOWER(IF(c.catid != 0, CONCAT(s.`title`, '/', ct.`title`, '/', c.`title`), c.`title`)) FROM `#__content` AS c LEFT JOIN `#__categories` AS ct ON ct.id = c.catid LEFT JOIN `#__sections` AS s on s.id = c.sectionid WHERE c.`id` = {id}</query>
 			<empty>?</empty>
 		</var>

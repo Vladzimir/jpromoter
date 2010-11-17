@@ -98,22 +98,21 @@
         <tpl>/{holder}/{directoryName}.html</tpl>
     </cond>
 <!-- Variables -->
-	<var name="pagenum" type="query">
-	    <query>select ({limitstart} div {limit} + 1)</query>
-        <empty>0</empty>
+	<var name="pagenum" type="string">
+	    <value>({limitstart} / {limit} + 1)</value>
 	</var>
 
-	<var name="contentid" type="query">
+	<var name="contentid" type="query" ifpresent="contentid">
 	      <query>SELECT LOWER(slug) FROM `#__boss_{directory}_contents` where `id` = {contentid}</query>
         <empty>?</empty>
 	</var>
 
-	<var name="catid" type="query">
+	<var name="catid" type="query" ifpresent="catid">
 	    <query>SELECT LOWER(slug) FROM `#__boss_{directory}_categories` where `id` = {catid}</query>
         <empty>root</empty>
 	</var>
 
-    <var name="parents" type="query">
+    <var name="parents" type="query" ifpresent="catid">
 	      <query>
 		    SELECT
 		    LOWER(
@@ -151,7 +150,7 @@
         <empty></empty>
     </var>
 
-	<var name="userid" type="query">
+	<var name="userid" type="query" ifpresent="userid">
 	      <query>SELECT LOWER(name) FROM `#__users` where `id` = {userid}</query>
         <empty>?</empty>
 	</var>
@@ -164,7 +163,7 @@
         <value>{directory}</value>
 	</var>
 
-    <var name="directoryName" type="query">
+    <var name="directoryName" type="query" ifpresent="directory">
         <query>SELECT LOWER(slug) FROM `#__boss_config` where `id` = {directory}</query>
         <empty>{directory}</empty>
 	</var>
