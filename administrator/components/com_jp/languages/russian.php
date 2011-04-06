@@ -145,7 +145,7 @@ define("JP_REVERSE_TITLE_DESC", "По умолчанию жустинка ста
 define("JP_NONE", "Нет");
 define("JP_ALL_EXCEPT_PUBLISHED", "Все опубликованные");
 define("JP_ENABLE_SEF", "Включить SEF");
-define("JP_ENABLE_SEF", "Включить или выключить SEF линки");
+define("JP_ENABLE_SEF_DESC", "Включить или выключить SEF линки");
 define("JP_URL_FOR_UPDATE_SEF_INTEGRATIONS", "Ссылка для обновления SEF плагинов");
 define("JP_URL_FOR_UPDATE_SEF_INTEGRATIONS_DESC", "Ссылка для обновления SEF плагинов компонента JPromoter");
 define("JP_ENABLE_WORK_WITHOUT_MOD_REWRITE", "Включить работу без mod_rewrite");
@@ -154,16 +154,4 @@ define("JP_ENABLE_URL_TRANSLIT", "Включить транслитерацию"
 define("JP_ENABLE_URL_TRANSLIT_DESC", "Включает или выключает транслитерацию ссылок");
 define("JP_ENABLE_CACHE", "Включить кэш");
 define("JP_ENABLE_CACHE_DESC", "Включает или выключает кэш");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
 ?>
