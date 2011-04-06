@@ -32,10 +32,10 @@
       <query id="2"><![CDATA[DELETE FROM #__je_config WHERE component = 'com_jp';]]></query>
       <query id="3"><![CDATA[ 
            INSERT INTO `#__je_config` (`id`,`component`,`section`,`lable`,`name`,`type`,`description`,`values`,`selected`,`hidden`,`fieldset`) VALUES 
-           (NULL,'com_jp','general','Enable JPromoter','jp_enable','yesno','Turn JPromoter On or Off','','1','N','Control'),
-           (NULL,'com_jp','general','Enable Google Page Rank','jp_google_pr','yesno','ATTENTION: It can slow down simulate process.','','0','N','Google tools'),
-           (NULL,'com_jp','general','Rows in Report','jp_toppage','text','Amount of rows in table on report section','30','50','N','Control'),
-           (NULL,'com_jp','general','Suggest Keywords','jp_kw_per_page','text','How many keywords to suggest(list) on edit page section','36','36','N','Control'),
+           (NULL,'com_jp','general','JP_ENABLE_JPROMOTER','jp_enable','yesno','JP_ENABLE_JPROMOTER_DESC','','1','N','Control'),
+           (NULL,'com_jp','general','JP_ENABLE_GOOLE_PR','jp_google_pr','yesno','JP_ENABLE_GOOLE_PR_DESC','','0','N','Google tools'),
+           (NULL,'com_jp','general','JP_ROWS_REPORT','jp_toppage','text','JP_ROWS_REPORT_DESC','30','50','N','Control'),
+           (NULL,'com_jp','general','JP_SUGGEST_KEYWORDS','jp_kw_per_page','text','JP_SUGGEST_KEYWORDS_DESC','36','36','N','Control'),
            (NULL,'com_jp','general','Enable Alexa Page Rank','jp_alexa_pr','yesno','ATTENTION: It can slow down simulate process.','','0','N','PR - Alexa'),
            (NULL,'com_jp','general','Alexa key','jp_alexa_key','text','Enter your alexe key','','','N','PR - Alexa'),
            (NULL,'com_jp','general','Alexa secret key','jp_alexa_secret_key','text','Enter Youe Alexa Secret Key','','','N','PR - Alexa'),

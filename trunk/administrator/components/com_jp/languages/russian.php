@@ -98,4 +98,26 @@ define("JP_CONFIGURATION1", "Настройка JPromoter =)");
 define("JP_CGN", "Не могу опознать имя компонента в конфигурации");
 define("JP_ERROR1", "Не могу сохранить, нет опций.");
 
+// Инсталляционный файл
+define("JP_ENABLE_JPROMOTER", "Включить JPromoter");
+define("JP_ENABLE_JPROMOTER_DESC", "Включение или выключение работоспособности JPromoter");
+define("JP_ENABLE_GOOLE_PR", "Включить Google Page Rank");
+define("JP_ENABLE_GOOLE_PR_DESC", "ВНИМАНИЕ: Возможно замедление процесса симуляции.");
+define("JP_ROWS_REPORT", "Рядов в отчете");
+define("JP_ROWS_REPORT_DESC", "Кол-во рядов в таблице отчета");
+define("JP_SUGGEST_KEYWORDS", "Ключевых слов");
+define("JP_SUGGEST_KEYWORDS_DESC", "Кол-во ключевых слов, предлагаемых на странице редактирования");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
 ?>
