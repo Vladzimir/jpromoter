@@ -164,7 +164,7 @@ class JEConfig
                 $items = explode( ",", $row->values ) ;
                 foreach ( $items as $item )
                 {
-                    $list[] = mosHTML::makeOption( trim( $item ), trim( $item ) ) ;
+                    $list[] = mosHTML::makeOption( constant( trim( $item ) ), constant( trim( $item ) ) ) ;
                 }
                 $out = mosHTML::selectList( $list, $row->name . $row->id, 'class="inputbox" size="' . count( $items ) . '" ', 'value', 'text', $row->selected ) ;
                 break ;
@@ -172,7 +172,7 @@ class JEConfig
                 $items = explode( ",", $row->values ) ;
                 foreach ( $items as $item )
                 {
-                    $list[] = mosHTML::makeOption( trim( $item ), trim( $item ) ) ;
+                    $list[] = mosHTML::makeOption( constant( trim( $item ) ), constant( trim( $item ) ) ) ;
                 }
                 $out = mosHTML::selectList( $list, $row->name . $row->id, 'class="inputbox" size="1" ', 'value', 'text', $row->selected ) ;
                 break ;
