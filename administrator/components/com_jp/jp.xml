@@ -39,7 +39,7 @@
            (NULL,'com_jp','JP_GENERAL','JP_ENABLE_ALEXA_PR','jp_alexa_pr','yesno','JP_ENABLE_ALEXA_PR_DESC','','0','N','JP_PR_ALEXA'),
            (NULL,'com_jp','JP_GENERAL','JP_ALEXA_KEY','jp_alexa_key','text','JP_ALEXA_KEY_DESC','','','N','JP_PR_ALEXA'),
            (NULL,'com_jp','JP_GENERAL','JP_ALEXA_SECRET_KEY','jp_alexa_secret_key','text','JP_ALEXA_SECRET_KEY_DESC','','','N','JP_PR_ALEXA'),
-           (NULL,'com_jp','JP_GENERAL','JP_DEFAULT_CHANGEFREQ','jp_gsm_changefreq','dropdown','','JP_ALWAYS, JP_HOURLY, JP_DAILY, JP_WEEKLY, JP_MONTHLY, JP_YEARLY, JP_NEVER','monthly','N','JP_GOOGLE_TOOLS'),
+           (NULL,'com_jp','JP_GENERAL','JP_DEFAULT_CHANGEFREQ','jp_gsm_changefreq','dropdown','','JP_ALWAYS, JP_HOURLY, JP_DAILY, JP_WEEKLY, JP_MONTHLY, JP_YEARLY, JP_NEVER','JP_MONTHLY','N','JP_GOOGLE_TOOLS'),
            (NULL,'com_jp','JP_GENERAL','JP_GOOGLE_SITEMAP_BASED_ON','jp_gsm_pages','selectlist','','JP_INDEXED_PAGES, JP_PUBLISHED_PAGES, JP_NOT_HIDDEN_PAGES','JP_NOT_HIDDEN_PAGES','N','JP_GOOGLE_TOOLS'),
            (NULL,'com_jp','JP_GENERAL','JP_GOOGLE_APROVE_META','jp_meta_verify','text','JP_GOOGLE_APROVE_META_DESC','','','N','JP_GOOGLE_TOOLS'),
            (NULL,'com_jp','JP_GENERAL','JP_GOOGLE_SITEMAP_FILE_NAME','jp_sitemap_filename','text','JP_GOOGLE_SITEMAP_FILE_NAME_DESC','','sitemap.xml','N','JP_GOOGLE_TOOLS'),
