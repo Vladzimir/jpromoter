@@ -113,7 +113,7 @@ class JEConfig
                 {
                     $tabs->endTab() ;
                 }
-                $tabs->startTab( ucfirst( $row->section ), 'tab-' . $row->section ) ;
+                $tabs->startTab( constant( ucfirst( $row->section ) ), 'tab-' . $row->section) ;
             }
             if ( $set != $row->fieldset )
             {
