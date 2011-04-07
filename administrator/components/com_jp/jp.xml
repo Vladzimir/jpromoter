@@ -230,6 +230,7 @@ CREATE TABLE #__jp_pages (
       <filename>images/opendetail_1.gif</filename>
       <filename>images/cpanel.gif</filename>      
       <filename>images/cpanel.png</filename>
+	  <filename>images/configa.png</filename>
       <filename>images/google.png</filename>
       <filename>images/google16.png</filename>
       <filename>images/icon16.png</filename>
@@ -251,6 +252,7 @@ CREATE TABLE #__jp_pages (
       <filename>images/status_r.png</filename>  
       <filename>images/status_y.png</filename>  
       <filename>images/status_g.png</filename>  
+	  <filename>images/simulations.png</filename>
       <filename>images/pagerank.gif</filename>  
       <filename>images/hide.gif</filename>  
       <filename>images/sitemap.gif</filename>  
