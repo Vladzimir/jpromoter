@@ -218,6 +218,8 @@ CREATE TABLE #__jp_pages (
       <filename>xajax/xajax_js/xajax.js</filename>
       <filename>xajax/xajax_js/xajax_uncompressed.js</filename>
       <filename>help/index.html</filename>
+      <filename>languages/russian.php</filename>
+      <filename>languages/index.html</filename>
       <!-- XML CONFIGS 1 item -->
       <filename>sef_configs/jp_com_content.xml</filename>
       <filename>sef_configs/index.html</filename>
@@ -252,14 +254,12 @@ CREATE TABLE #__jp_pages (
       <filename>images/status_r.png</filename>  
       <filename>images/status_y.png</filename>  
       <filename>images/status_g.png</filename>  
-	  <filename>images/simulations.png</filename>
+	  <filename>images/simulation.png</filename>
       <filename>images/pagerank.gif</filename>  
       <filename>images/hide.gif</filename>  
       <filename>images/sitemap.gif</filename>  
       <filename>images/spacer.gif</filename>
       <filename>images/opendetail.png</filename>
-      <filename>languages/russian.php</filename>
-      <filename>languages/index.html</filename>
     </images>
     
   </administration>
