@@ -121,7 +121,7 @@ class JEConfig
                 //{
                 //   $tabs .= '</fieldset>';
                 //}
-                echo '<fieldset style="display:block; width:5%; float:left; clear:both"><LEGEND>' . ucfirst( $row->fieldset ) .
+                echo '<fieldset style="display:block; width:5%; float:left; clear:both"><LEGEND>' . constant( ucfirst( $row->fieldset ) ) .
                     '</LEGEND><table width="20%" class="admintable">' ;
             }
             $com = $row->section ;
