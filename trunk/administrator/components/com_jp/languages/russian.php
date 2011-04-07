@@ -162,14 +162,4 @@ define("JP_SEF_CONFIGURATION", "Конфигурация SEF");
 define("JP_GENERAL", "Общие");
 define("JP_META", "Meta");
 define("JP_SEF", "ЧПУ");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
-define("", "");
 ?>
