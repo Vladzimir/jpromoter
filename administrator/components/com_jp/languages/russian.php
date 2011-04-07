@@ -154,4 +154,22 @@ define("JP_ENABLE_URL_TRANSLIT", "Включить транслитерацию"
 define("JP_ENABLE_URL_TRANSLIT_DESC", "Включает или выключает транслитерацию ссылок");
 define("JP_ENABLE_CACHE", "Включить кэш");
 define("JP_ENABLE_CACHE_DESC", "Включает или выключает кэш");
+define("JP_CONTROL", "Управление");
+define("JP_GOOGLE_TOOLS", "Инструменты Google");
+define("JP_PR_ALEXA", "RP - Alexa");
+define("JP_DEF_META_INFO", "Мета информация по умолчанию");
+define("JP_SEF_CONFIGURATION", "Конфигурация SEF");
+define("JP_GENERAL", "Общие");
+define("JP_META", "Meta");
+define("JP_SEF", "ЧПУ");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
+define("", "");
 ?>
